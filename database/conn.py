@@ -26,7 +26,7 @@ class Connection:
     async def init_collections(self):
         collections = await self.app.database.list_collection_names()
         if "role" not in collections:
-            await self.app.database.create_collection("role")
+            await self.app.database.create_collection("role_play")
 
         if "user" not in collections:
             await self.app.database.create_collection("user")
