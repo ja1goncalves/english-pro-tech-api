@@ -1,0 +1,360 @@
+{
+  "role": [
+    {
+      "name": "Júnior",
+      "code": "JR",
+      "min_xp": 0,
+      "max_xp": 300,
+      "level": [
+        {
+          "step": 1,
+          "min_xp": 0,
+          "max_xp": 100,
+          "play": [
+            {
+              "challenge": "Simular entrevista inicial",
+              "xp": 20
+            },
+            {
+              "challenge": "Explicar experiências anteriores",
+              "xp": 20
+            },
+            {
+              "challenge": "Descrever pontos fortes e fracos",
+              "xp": 20
+            },
+            {
+              "challenge": "Perguntar sobre a vaga",
+              "xp": 20
+            },
+            {
+              "challenge": "Agradecer e encerrar entrevista",
+              "xp": 20
+            }
+          ]
+        },
+        {
+          "step": 2,
+          "min_xp": 101,
+          "max_xp": 200,
+          "play": [
+            {
+              "challenge": "Receber boas-vindas do RH",
+              "xp": 20
+            },
+            {
+              "challenge": "Apresentar-se para colegas",
+              "xp": 20
+            },
+            {
+              "challenge": "Descrever rotina de trabalho",
+              "xp": 20
+            },
+            {
+              "challenge": "Perguntar sobre políticas internas",
+              "xp": 20
+            },
+            {
+              "challenge": "Entender regras de segurança da empresa",
+              "xp": 20
+            }
+          ]
+        },
+        {
+          "step": 3,
+          "min_xp": 201,
+          "max_xp": 300,
+          "play": [
+            {
+              "challenge": "Small talk com colegas internacionais",
+              "xp": 20
+            },
+            {
+              "challenge": "Comparar fusos horários e agenda",
+              "xp": 20
+            },
+            {
+              "challenge": "Explicar funções no time",
+              "xp": 20
+            },
+            {
+              "challenge": "Reagir a apresentações de colegas",
+              "xp": 20
+            },
+            {
+              "challenge": "Combinar horários de reuniões",
+              "xp": 20
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Pleno",
+      "code": "PL",
+      "min_xp": 301,
+      "max_xp": 900,
+      "level": [
+        {
+          "step": 1,
+          "min_xp": 301,
+          "max_xp": 500,
+          "play": [
+            {
+              "challenge": "Apresentar-se ao cliente",
+              "xp": 40
+            },
+            {
+              "challenge": "Fazer perguntas sobre requisitos",
+              "xp": 40
+            },
+            {
+              "challenge": "Confirmar escopo do projeto",
+              "xp": 40
+            },
+            {
+              "challenge": "Tomar notas e resumir",
+              "xp": 40
+            },
+            {
+              "challenge": "Encerrar reunião profissionalmente",
+              "xp": 40
+            }
+          ]
+        },
+        {
+          "step": 2,
+          "min_xp": 501,
+          "max_xp": 700,
+          "play": [
+            {
+              "challenge": "Relatar progresso",
+              "xp": 40
+            },
+            {
+              "challenge": "Reportar dificuldades",
+              "xp": 40
+            },
+            {
+              "challenge": "Escutar e responder updates",
+              "xp": 40
+            },
+            {
+              "challenge": "Praticar turn-taking em inglês",
+              "xp": 40
+            },
+            {
+              "challenge": "Encerrar a daily com próximo passo",
+              "xp": 40
+            }
+          ]
+        },
+        {
+          "step": 3,
+          "min_xp": 701,
+          "max_xp": 900,
+          "play": [
+            {
+              "challenge": "Apresentar status do projeto",
+              "xp": 40
+            },
+            {
+              "challenge": "Explicar mudanças no cronograma",
+              "xp": 40
+            },
+            {
+              "challenge": "Dar feedback ao cliente",
+              "xp": 40
+            },
+            {
+              "challenge": "Negociar entregas",
+              "xp": 40
+            },
+            {
+              "challenge": "Encerrar destacando próximos marcos",
+              "xp": 40
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Sênior",
+      "code": "SR",
+      "min_xp": 901,
+      "max_xp": 1800,
+      "level": [
+        {
+          "step": 1,
+          "min_xp": 901,
+          "max_xp": 1200,
+          "play": [
+            {
+              "challenge": "Explicar arquitetura de sistema",
+              "xp": 60
+            },
+            {
+              "challenge": "Mostrar slides em inglês",
+              "xp": 60
+            },
+            {
+              "challenge": "Responder perguntas difíceis",
+              "xp": 60
+            },
+            {
+              "challenge": "Explicar vantagens da solução",
+              "xp": 60
+            },
+            {
+              "challenge": "Concluir com call-to-action",
+              "xp": 60
+            }
+          ]
+        },
+        {
+          "step": 2,
+          "min_xp": 1201,
+          "max_xp": 1500,
+          "play": [
+            {
+              "challenge": "Cumprimentar presencialmente",
+              "xp": 60
+            },
+            {
+              "challenge": "Guiar cliente em tour pela empresa",
+              "xp": 60
+            },
+            {
+              "challenge": "Demonstrar produto em uso",
+              "xp": 60
+            },
+            {
+              "challenge": "Responder dúvidas em tempo real",
+              "xp": 60
+            },
+            {
+              "challenge": "Encerrar agradecendo visita",
+              "xp": 60
+            }
+          ]
+        },
+        {
+          "step": 3,
+          "min_xp": 1501,
+          "max_xp": 1800,
+          "play": [
+            {
+              "challenge": "Mediar divergência de opiniões",
+              "xp": 60
+            },
+            {
+              "challenge": "Expressar desacordo polidamente",
+              "xp": 60
+            },
+            {
+              "challenge": "Reunir argumentos técnicos",
+              "xp": 60
+            },
+            {
+              "challenge": "Propor soluções alternativas",
+              "xp": 60
+            },
+            {
+              "challenge": "Finalizar acordo em comum",
+              "xp": 60
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tech Lead",
+      "code": "TL",
+      "min_xp": 1801,
+      "max_xp": 3000,
+      "level": [
+        {
+          "step": 1,
+          "min_xp": 1801,
+          "max_xp": 2200,
+          "play": [
+            {
+              "challenge": "Fazer check-in no aeroporto",
+              "xp": 80
+            },
+            {
+              "challenge": "Reservar hotel e pedir serviços",
+              "xp": 80
+            },
+            {
+              "challenge": "Networking em evento",
+              "xp": 80
+            },
+            {
+              "challenge": "Resolver problema de reserva",
+              "xp": 80
+            },
+            {
+              "challenge": "Apresentar-se em jantar de negócios",
+              "xp": 80
+            }
+          ]
+        },
+        {
+          "step": 2,
+          "min_xp": 2201,
+          "max_xp": 2600,
+          "play": [
+            {
+              "challenge": "Delegar tarefas em inglês",
+              "xp": 80
+            },
+            {
+              "challenge": "Dar feedback à equipe",
+              "xp": 80
+            },
+            {
+              "challenge": "Negociar prazos com cliente",
+              "xp": 80
+            },
+            {
+              "challenge": "Motivar time em dificuldades",
+              "xp": 80
+            },
+            {
+              "challenge": "Finalizar reunião com resumo",
+              "xp": 80
+            }
+          ]
+        },
+        {
+          "step": 3,
+          "min_xp": 2601,
+          "max_xp": 3000,
+          "tasks": [
+            {
+              "challenge": "Apresentar projeto para investidores",
+              "xp": 80
+            },
+            {
+              "challenge": "Responder Q&A com público",
+              "xp": 80
+            },
+            {
+              "challenge": "Networking pós-palestra",
+              "xp": 80
+            },
+            {
+              "challenge": "Conduzir painel de discussão",
+              "xp": 80
+            },
+            {
+              "challenge": "Encerrar conferência com impacto",
+              "xp": 80
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

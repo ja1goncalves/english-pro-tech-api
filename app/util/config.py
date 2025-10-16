@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = os.getenv('TOKEN_TTL', 30)
     DB_URI: str = os.getenv('DB_URI', 'postgresql://username:password@localhost:5432/test')
     DB_NAME: str = os.getenv('DB_NAME', 'ept_db')
+    ADMIN_PASSWORD: str = os.getenv('ADMIN_PASSWORD', 'admin123')
     FILE_UPLOAD_DIR: str = os.getenv('FILE_UPLOAD_DIR', './files')
 
     class Config:
