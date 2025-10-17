@@ -4,6 +4,7 @@ import jwt
 from pymongo.asynchronous.database import AsyncDatabase
 
 from app.exception.exception import ForbiddenError
+from app.model.entity import UserBase
 from app.util.config import settings
 from passlib.context import CryptContext
 
@@ -25,7 +26,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
 
-async def validate_token(db: AsyncDatabase, token: str):
+async def validate_token(db: AsyncDatabase, token: str) -> UserBase:
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         username: str = payload.get("sub")

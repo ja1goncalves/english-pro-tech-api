@@ -56,7 +56,7 @@ class AuthService(Service[UserDTO]):
         return bool(user.email) # TODO send email with reset link or new password
 
     async def reset_password(self, token: str, body: ResetPasswordDTO) -> bool:
-        user = validate_token(self.db, token)
+        user: UserBase = await validate_token(self.db, token)
         if user:
             user.password = get_password_hash(body.new_password)
             updated_user = await self.update(user)
@@ -83,7 +83,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
         try:
             # Replace with your actual token validation logic
             # e.g., decode JWT, verify signature, check expiration
-            user_data = validate_token(request.app.database, token)
+            user_data: UserBase = await validate_token(request.app.database, token)
             request.state.user = user_data # Store user data for later access in routes
         except Exception as e:
             return JSONResponse({"detail": f"Invalid token: {e}"}, status_code=401)

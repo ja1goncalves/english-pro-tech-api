@@ -1,9 +1,22 @@
 from fastapi import APIRouter, Depends, Body, Request, Response, HTTPException, status
-from app.model.dto import BodyResponse
+from app.model.dto import UserDTO, UserCreateDTO, UserUpdateDTO
+from app.model.type import UserProfile
+from app.service.user_service import UserService
 
 prefix = "/v1/user"
 router = APIRouter()
 
-@router.post("/", response_model=BodyResponse)
-async def register(request: Request, body = Body(...)):
-    return { "data": body, "db": request.app.database }
+@router.post("/register", response_model=UserDTO)
+async def add_user(request: Request, user: UserCreateDTO):
+    service = UserService(request.app.database)
+    user.profile = UserProfile.STUDENT
+    return await service.add(user)
+
+@router.put("/", response_model=UserDTO)
+async def put_user(request: Request, body: UserUpdateDTO):
+    service = UserService(request.app.database)
+    return await service.update(body)
+
+@router.get("/me", response_model=UserDTO)
+async def get_user(request: Request):
+    return request.state.user

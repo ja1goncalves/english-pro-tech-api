@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Body, Request
-from app.model.dto import BodyResponse, UserCreateDTO, UserDTO, UserUpdateDTO, RoleDTO
+from app.model.dto import UserCreateDTO, UserDTO, UserUpdateDTO, RoleDTO
 from app.service.role_play_service import RolePlayService
 from app.service.user_service import UserService
 

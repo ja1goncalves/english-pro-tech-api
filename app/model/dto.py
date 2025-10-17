@@ -21,16 +21,13 @@ class ResetPasswordDTO(BaseModel):
     password: str
     confirm_password: str
 
-class BodyResponse(BaseModel):
-    pass
-
 class RolePlayDTO(BaseModel):
     id: Optional[str]
     challenge: str
     xp: int = 0
     description: Optional[str] = None
     metadata: Optional[List[dict]] = None
-    disabled: bool = True
+    disabled: Optional[bool] = True
 
 class RoleLevelDTO(BaseModel):
     id: Optional[str]
@@ -38,7 +35,7 @@ class RoleLevelDTO(BaseModel):
     min_xp: int
     max_xp: int
     play: Optional[List[RolePlayDTO]] = []
-    disabled: bool = False
+    disabled: Optional[bool] = False
 
 class RoleDTO(BaseModel):
     id: Optional[str]
@@ -47,7 +44,13 @@ class RoleDTO(BaseModel):
     min_xp: int = 0
     max_xp: int = 0
     level: Optional[List[RoleLevelDTO]] = []
-    disabled: bool = True
+    disabled: Optional[bool] = True
+
+class PlayTaskDTO(BaseModel):
+    role_id: str
+    level_id: str
+    play_id: str
+    answer: str
 
 class UserDTO(BaseModel):
     id: str
