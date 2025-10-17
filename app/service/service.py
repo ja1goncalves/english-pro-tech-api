@@ -17,8 +17,9 @@ class Service(Generic[T]):
         new_data = data.model_dump(by_alias=True, exclude={"id"})
         return await self.repository.add(new_data)
 
-    async def update(self, data) -> T | None:
-        return await self.repository.update(data)
+    async def update(self, data) -> bool:
+        update_result = await self.repository.update(data)
+        return update_result.modified_count == 1
 
     async def remove(self, key: str) -> bool:
         delete_result = await self.repository.remove(key)

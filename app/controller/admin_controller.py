@@ -18,7 +18,7 @@ async def add_user(request: Request, body: UserCreateDTO):
     service = UserService(request.app.database)
     return await service.add(body)
 
-@user_router.put("/", response_model=UserDTO)
+@user_router.put("/", response_model=None)
 async def put_user(request: Request, body: UserUpdateDTO):
     service = UserService(request.app.database)
     return await service.update(body)
@@ -40,7 +40,7 @@ async def add_role_play(request: Request, body: RoleDTO):
     service = RolePlayService(request.app.database)
     return await service.add(body)
 
-@role_play_router.put("/", response_model=RoleDTO)
+@role_play_router.put("/", response_model=None)
 async def put_role_play(request: Request, body: RoleDTO):
     service = RolePlayService(request.app.database)
     return await service.update(body)

@@ -5,5 +5,5 @@ prefix = "/v1/user"
 router = APIRouter()
 
 @router.post("/", response_model=BodyResponse)
-def register(request: Request, body = Body(...)):
+async def register(request: Request, body = Body(...)):
     return { "data": body, "db": request.app.database }

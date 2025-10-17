@@ -5,10 +5,21 @@ from datetime import datetime
 from app.model.entity import UserRolePlay
 from app.model.type import UserProfile, RoleStudent, StudentLevel
 
+class LoginDTO(BaseModel):
+    username: str
+    password: str
 
-class Token(BaseModel):
+class TokenDTO(BaseModel):
     access_token: str
     token_type: str
+
+class AskResetPasswordDTO(BaseModel):
+    username: str
+    email: EmailStr
+
+class ResetPasswordDTO(BaseModel):
+    password: str
+    confirm_password: str
 
 class BodyResponse(BaseModel):
     pass

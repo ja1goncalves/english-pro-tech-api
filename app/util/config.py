@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     DB_NAME: str = os.getenv('DB_NAME', 'ept_db')
     ADMIN_PASSWORD: str = os.getenv('ADMIN_PASSWORD', 'admin123')
     FILE_UPLOAD_DIR: str = os.getenv('FILE_UPLOAD_DIR', './files')
+    OPEN_ROUTES: list[str] = ["/api/v1/auth/token", "/api/v1/auth/reset-password", "/api/v1/user/register"]
 
     class Config:
         case_sensitive = True

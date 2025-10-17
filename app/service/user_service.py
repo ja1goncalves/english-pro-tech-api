@@ -9,7 +9,7 @@ from app.service.service import Service, T
 
 class UserService(Service[UserDTO]):
     def __init__(self, db: AsyncDatabase):
-        super().__init__(db.collection("user"))
+        super().__init__(db.get_collection("user"))
 
     async def get(self, key: str | None, params: dict = {}) -> UserDTO | list[UserDTO] | None:
         if key:

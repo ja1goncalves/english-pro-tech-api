@@ -9,7 +9,7 @@ from app.service.user_service import UserService
 class RolePlayService(Service[RoleDTO]):
     def __init__(self, db: AsyncDatabase):
         self.db = db
-        super().__init__(self.db.collection("role_play"))
+        super().__init__(self.db.get_collection("role_play"))
 
     async def get(self, key: str | None, params: dict = {}) -> RoleDTO | list[RoleDTO] | None:
         if key:

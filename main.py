@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+
+from app.service.auth_service import AuthMiddleware
 from database.conn import Connection
 from app.router.routes import api
 from contextlib import asynccontextmanager
@@ -13,6 +15,7 @@ async def lifespan(app: FastAPI):
     await conn.shutdown_db_client()
 
 app = FastAPI(lifespan=lifespan, swagger_ui_parameters={"syntaxHighlight": {"theme": "obsidian"}})
+app.add_middleware(AuthMiddleware)
 
 @app.get("/")
 async def root():
