@@ -2,8 +2,13 @@ from pydantic import BaseModel, Field, EmailStr, validator
 from typing import Optional, List
 from datetime import datetime
 
-from app.model.entity import UserRolePlay
+from app.model.entity import UserPlayStory
 from app.model.type import UserProfile, RoleStudent, StudentLevel
+
+class ChallengeDTO(BaseModel):
+    question: str
+    response: str
+    xp: int
 
 class LoginDTO(BaseModel):
     username: str
@@ -22,7 +27,7 @@ class ResetPasswordDTO(BaseModel):
     confirm_password: str
 
 class RolePlayDTO(BaseModel):
-    id: Optional[str]
+    id: str
     challenge: str
     xp: int = 0
     description: Optional[str] = None
@@ -34,7 +39,7 @@ class RoleLevelDTO(BaseModel):
     step: int = 1
     min_xp: int
     max_xp: int
-    play: Optional[List[RolePlayDTO]] = []
+    plays: Optional[List[RolePlayDTO]] = []
     disabled: Optional[bool] = False
 
 class RoleDTO(BaseModel):
@@ -50,7 +55,7 @@ class PlayTaskDTO(BaseModel):
     role_id: str
     level_id: str
     play_id: str
-    answer: str
+    answer: Optional[str] = None
 
 class UserDTO(BaseModel):
     id: str
@@ -61,7 +66,7 @@ class UserDTO(BaseModel):
     document: Optional[str] = None
     level: Optional[StudentLevel] = None
     xp: Optional[int] = 0
-    role_play: Optional[List[UserRolePlay]] = None
+    play_story: Optional[List[UserPlayStory]] = None
     token: Optional[str] = None
     created_at: Optional[datetime] = None
 

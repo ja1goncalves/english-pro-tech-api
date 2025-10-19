@@ -1,6 +1,8 @@
 from typing import List
-from fastapi import APIRouter, Request
-from app.model.dto import RoleDTO, PlayTaskDTO
+from fastapi import APIRouter, Request, HTTPException, status
+
+from app.exception.exception import RoleLevelError
+from app.model.dto import RoleDTO, PlayTaskDTO, ChallengeDTO
 from app.service.role_play_service import RolePlayService
 
 prefix = "/v1/role-play"
@@ -11,7 +13,14 @@ async def get_role_play(request: Request):
     service = RolePlayService(request.app.database)
     return await service.get_by_user(request.state.user)
 
-@router.post("/", response_model=RoleDTO)
+@router.post("/", response_model=ChallengeDTO)
 async def play_task(request: Request, play: PlayTaskDTO):
-    service = RolePlayService(request.app.database)
-    return await service.play_task(request.state.user, play)
+    try:
+        service = RolePlayService(request.app.database)
+        return await service.play_task(request.state.user, play)
+    except RoleLevelError as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=e.message,
+            headers={"WWW-Authenticate": "Bearer"}
+        )

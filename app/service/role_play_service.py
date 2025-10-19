@@ -1,9 +1,11 @@
+from app.exception.exception import RoleLevelError
 from app.model.entity import UserBase
-from app.util.role_play import role_enable, get_code_level
+from app.service.gen_ia_service import GenIAService
+from app.util.role_play import role_enable, get_code_level, get_story_play, is_story_play, new_story_play
 from pymongo.asynchronous.database import AsyncDatabase
-from app.model.dto import UserDTO, UserCreateDTO, RoleDTO, PlayTaskDTO
-from app.model.type import UserProfile, StudentLevel
-from app.service.service import Service, T
+from app.model.dto import RoleDTO, PlayTaskDTO, RoleLevelDTO, RolePlayDTO, ChallengeDTO
+from app.model.type import StudentLevel, RoleStudent
+from app.service.service import Service
 from app.service.user_service import UserService
 
 
@@ -17,7 +19,7 @@ class RolePlayService(Service[RoleDTO]):
             return await super().get(key)
         return await super().all(
             params,
-            params["limit"] if "limit" in params else 100,
+            params["limit"] if "limit" in params else 1000,
             params["offset"] if "offset" in params else 0
         )
 
@@ -31,27 +33,69 @@ class RolePlayService(Service[RoleDTO]):
             for role_level in role.level:
                 role_level["disabled"] = user_level < role_level
 
-    async def play_task(self, user: UserBase, play: PlayTaskDTO) -> RoleDTO:
+    async def play_task(self, user: UserBase, data: PlayTaskDTO) -> ChallengeDTO:
+        role: RoleDTO = await self.get(data.role_id)
+        level: RoleLevelDTO = next(lvl for lvl in role.level if lvl.id == data.level_id)
+        play: RolePlayDTO = next(pl for pl in level.plays if pl.id == data.play_id)
+
+        user_role_code, user_role_level = get_code_level(user)
+
+        if role.code == user_role_code and level.step == user_role_level:
+            user_play_history = user.play_story or []
+            user_role_play = get_story_play(role.code, level.step, data.play_id, user_play_history)
+            gen_ia_service = GenIAService(user)
+
+            if not user_role_play:
+                question, response = await gen_ia_service.init_play(role, level, play)
+                res = ChallengeDTO(question=question, response=response, xp=0)
+                await self.update_user_role_play(user, role.code, level.step, data.play_id, res)
+
+                return res
+            else:
+                xp, question, response = await gen_ia_service.answer_play(data.answer, user_role_play, role, level, play)
+                res = ChallengeDTO(question=question, response=response, xp=xp)
+                await self.update_user_role_play(user, role.code, level.step, data.play_id, res)
+                return res
+        else:
+            raise RoleLevelError("User role does not match the requested role play")
+
+    async def update_user_role_play(self, user: UserBase, role_code: RoleStudent, role_level: int, play_id: str,
+                                    play: ChallengeDTO) -> UserBase:
+        if not user.play_story:
+            user.play_story = []
+            user = new_story_play(user, role_code, role_level, play_id, play)
+        else:
+            for story in user.play_story:
+                if is_story_play(story, role_code, role_level, play_id):
+                    story.xp = (story.xp or 0) + play.xp
+                    if story.metadata:
+                        story.metadata.append(play.model_dump(by_alias=True))
+                    else:
+                        story.metadata = [play.model_dump(by_alias=True)]
+                    break
+                else:
+                    user = new_story_play(user, role_code, role_level, play_id, play)
+
+        user.xp = (user.xp or 0) + play.xp
+        user.level = await self.classifier_user(user)
+
         user_service = UserService(self.db)
-        role = await self.get(play.role_id)
-        if not role or role.disabled:
-            raise Exception("Role not found or disabled")
+        await user_service.update(user)
 
-        level = next((lvl for lvl in role.level if lvl.id == play.level_id and not lvl.disabled), None)
-        if not level:
-            raise Exception("Level not found or disabled")
+        return user
 
-        task = next((tsk for tsk in level.play if tsk.id == play.play_id and not tsk.disabled), None)
-        if not task:
-            raise Exception("Play task not found or disabled")
+    async def classifier_user(self, user: UserBase) -> StudentLevel:
+        roles = await self.get(None)
+        new_role = None
+        new_level = None
 
-        # Here you would implement the logic to check the answer
-        # For simplicity, let's assume any answer is correct
-        user.xp += task.xp
+        for role in roles:
+            if role.min_xp <= user.xp <= role.max_xp:
+                new_role = role.code
+                for level in role.level:
+                    if level.min_xp <= user.xp <= level.max_xp:
+                        new_level = level.step
+                        break
+                break
 
-        # Update user level based on new XP
-        user_code, user_level = get_code_level(user)
-        user.level = StudentLevel(user_level)
-
-        await user_service.update(user.model_dump(by_alias=True))
-        return role
+        return f"{new_role}#{new_level}" if new_role and new_level else user.level

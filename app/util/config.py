@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     ADMIN_PASSWORD: str = os.getenv('ADMIN_PASSWORD', 'admin123')
     FILE_UPLOAD_DIR: str = os.getenv('FILE_UPLOAD_DIR', './files')
     OPEN_ROUTES: list[str] = ["/api/v1/auth/token", "/api/v1/auth/reset-password", "/api/v1/user/register"]
+    GEN_AI_MODEL: str = os.getenv('GEN_AI_MODEL', 'llama3')
+    GEN_AI_URL: str = os.getenv('GEN_AI_URL', 'http://localhost:11434/api')
 
     class Config:
         case_sensitive = True

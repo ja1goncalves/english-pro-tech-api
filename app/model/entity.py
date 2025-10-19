@@ -3,6 +3,8 @@ from datetime import datetime
 from pydantic import BaseModel, Field, EmailStr
 from typing import Optional, List
 import uuid
+
+from app.model.dto import ChallengeDTO
 from app.model.type import UserProfile, RoleStudent, StudentLevel
 
 
@@ -18,7 +20,7 @@ class RoleLevel(BaseModel):
     step: int = 1
     min_xp: int
     max_xp: int
-    play: List[RolePlay] = []
+    plays: List[RolePlay] = []
 
 class Role(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
@@ -28,12 +30,13 @@ class Role(BaseModel):
     max_xp: int = 0
     level: List[RoleLevel] = []
 
-class UserRolePlay(BaseModel):
+class UserPlayStory(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
     role: RoleStudent = RoleStudent.JR
     level_step: int = 1
+    play_id: str
     xp: int = 0
-    plays: Optional[List[RolePlay]] = None
+    metadata: Optional[List[ChallengeDTO]] = []
 
 class UserBase(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
@@ -45,6 +48,6 @@ class UserBase(BaseModel):
     document: Optional[str] = None
     level: Optional[StudentLevel] = None
     xp: Optional[int] = 0
-    role_play: Optional[List[UserRolePlay]] = None
+    play_story: Optional[List[UserPlayStory]] = None
     token: Optional[str] = None
     created_at: Optional[datetime] = None
