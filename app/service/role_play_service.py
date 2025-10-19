@@ -24,8 +24,10 @@ class RolePlayService(Service[RoleDTO]):
         )
 
     async def get_by_user(self, user: UserBase) -> list[RoleDTO] | None:
-        user_code, user_level = get_code_level(user)
-        enable_roles = role_enable(user)
+        user_service = UserService(self.db)
+        user_db = await user_service.get(user.id)
+        user_code, user_level = get_code_level(user_db)
+        enable_roles = role_enable(user_db)
 
         roles = await super().all()
         for role in roles:
@@ -48,19 +50,20 @@ class RolePlayService(Service[RoleDTO]):
             if not user_role_play:
                 question, response = await gen_ia_service.init_play(role, level, play)
                 res = ChallengeDTO(question=question, response=response, xp=0)
-                await self.update_user_role_play(user, role.code, level.step, data.play_id, res)
-
+                finished = await self.update_user_role_play(user, role.code, level.step, data.play_id, res)
+                res.update_level = finished
                 return res
             else:
                 xp, question, response = await gen_ia_service.answer_play(data.answer, user_role_play, role, level, play)
                 res = ChallengeDTO(question=question, response=response, xp=xp)
-                await self.update_user_role_play(user, role.code, level.step, data.play_id, res)
+                finished = await self.update_user_role_play(user, role.code, level.step, data.play_id, res)
+                res.update_level = finished
                 return res
         else:
             raise RoleLevelError("User role does not match the requested role play")
 
     async def update_user_role_play(self, user: UserBase, role_code: RoleStudent, role_level: int, play_id: str,
-                                    play: ChallengeDTO) -> UserBase:
+                                    play: ChallengeDTO) -> bool:
         if not user.play_story:
             user.play_story = []
             user = new_story_play(user, role_code, role_level, play_id, play)
@@ -77,12 +80,13 @@ class RolePlayService(Service[RoleDTO]):
                     user = new_story_play(user, role_code, role_level, play_id, play)
 
         user.xp = (user.xp or 0) + play.xp
+        old_user_level = user.level
         user.level = await self.classifier_user(user)
 
         user_service = UserService(self.db)
         await user_service.update(user)
 
-        return user
+        return old_user_level != user.level
 
     async def classifier_user(self, user: UserBase) -> StudentLevel:
         roles = await self.get(None)

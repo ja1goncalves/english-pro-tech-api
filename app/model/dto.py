@@ -9,6 +9,7 @@ class ChallengeDTO(BaseModel):
     question: str
     response: str
     xp: int
+    update_level: Optional[bool] = False
 
 class LoginDTO(BaseModel):
     username: str

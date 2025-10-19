@@ -1,3 +1,4 @@
+import json
 from typing import List
 from fastapi import APIRouter, Request, HTTPException, status
 
@@ -22,5 +23,17 @@ async def play_task(request: Request, play: PlayTaskDTO):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=e.message,
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+    except json.JSONDecodeError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Decoding GEnAI response error",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Some internal error occurred",
             headers={"WWW-Authenticate": "Bearer"}
         )
