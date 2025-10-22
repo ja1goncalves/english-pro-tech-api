@@ -7,6 +7,7 @@ from app.util.config import settings
 from pymongo import AsyncMongoClient
 
 from app.util.security import get_password_hash
+from database.collections import Table
 
 
 class Connection:
@@ -25,22 +26,27 @@ class Connection:
 
     async def init_collections(self):
         collections = await self.app.database.list_collection_names()
-        if "role" not in collections:
-            await self.app.database.create_collection("role_play")
+        if Table.ROLE_PLAY not in collections:
+            await self.app.database.create_collection(Table.ROLE_PLAY)
 
-        if "user" not in collections:
-            await self.app.database.create_collection("user")
+        if Table.USER not in collections:
+            await self.app.database.create_collection(Table.USER)
 
         await self.populate_initial_data()
 
     async def populate_initial_data(self):
-        roles_collection = self.app.database.get_collection("role")
+        roles_collection = self.app.database.get_collection(Table.ROLE_PLAY)
         existing_roles = await roles_collection.count_documents({})
-        if existing_roles == 0:
-            initial_roles = json.load(open("./role_play.json"))
-            await roles_collection.insert_many(initial_roles)
+        with open("./database/role_play.json", "r") as f:
+            initial_roles = json.load(f)
+            if existing_roles == 0:
+                await roles_collection.insert_many(initial_roles["role"])
+            else:
+                for role in initial_roles["role"]:
+                    await roles_collection.update_one({"code": role["code"]}, {"$set": role}, upsert=True)
 
-        user_collection = self.app.database.get_collection("user")
+
+        user_collection = self.app.database.get_collection(Table.USER)
         existing_users = await user_collection.count_documents({})
         if existing_users == 0:
             admin = {

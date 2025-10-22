@@ -56,7 +56,7 @@ async def ask_new_password(request: Request, body: AskResetPasswordDTO):
         )
 
 @router.put("/reset-password", response_model=None)
-async def reset_password(request: Request, body: ResetPasswordDTO, query_params: dict = Depends()):
+async def reset_password(request: Request, body: ResetPasswordDTO, query_params = Depends()):
     try:
         if body.new_password != body.confirm_password:
             raise HTTPException(

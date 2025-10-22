@@ -4,9 +4,13 @@ from pydantic import BaseModel, Field, EmailStr
 from typing import Optional, List
 import uuid
 
-from app.model.dto import ChallengeDTO
 from app.model.type import UserProfile, RoleStudent, StudentLevel
 
+class Challenge(BaseModel):
+    question: str
+    response: str
+    xp: int
+    update_level: Optional[bool] = False
 
 class RolePlay(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
@@ -36,7 +40,7 @@ class UserPlayStory(BaseModel):
     level_step: int = 1
     play_id: str
     xp: int = 0
-    metadata: Optional[List[ChallengeDTO]] = []
+    metadata: Optional[List[Challenge]] = []
 
 class UserBase(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")

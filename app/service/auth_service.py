@@ -3,21 +3,20 @@ from pymongo.asynchronous.database import AsyncDatabase
 from app.exception.exception import CredentialsError, ForbiddenError, UpdateError
 from app.model.dto import TokenDTO, UserDTO, ResetPasswordDTO, AskResetPasswordDTO
 from app.model.entity import UserBase
-from app.service.service import Service, T
+from app.service.service import Service
 from app.util.config import settings
 from app.util.security import verify_password, create_access_token, validate_token, get_password_hash
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
 from starlette.requests import Request
 from typing import Callable
-
-import jwt
+from database.collections import Table
 
 
 class AuthService(Service[UserDTO]):
     def __init__(self, db: AsyncDatabase):
         self.db = db
-        super().__init__(db.get_collection("user"))
+        super().__init__(db.get_collection(Table.USER.__str__()))
 
     async def login(self, username: str, password: str) -> TokenDTO:
         user: UserBase = await self.collection.find_one({"username": username})

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Body, Request
+from fastapi import APIRouter, Depends, Body, Request, Query
 from app.model.dto import UserCreateDTO, UserDTO, UserUpdateDTO, RoleDTO
 from app.service.role_play_service import RolePlayService
 from app.service.user_service import UserService
@@ -9,7 +9,7 @@ router = APIRouter()
 user_router = APIRouter()
 
 @user_router.get("/{key}", response_model=UserDTO)
-async def get_user(request: Request, key: str, query_params: dict = Depends()):
+async def get_user(request: Request, key: str, query_params = Depends()):
     service = UserService(request.app.database)
     return await service.get(key, query_params)
 
@@ -31,7 +31,7 @@ async def del_user(request: Request, key: str):
 role_play_router = APIRouter()
 
 @role_play_router.get("/{key}", response_model=RoleDTO)
-async def get_role_play(request: Request, key: str, query_params: dict = Depends()):
+async def get_role_play(request: Request, key: str, query_params = Depends()):
     service = RolePlayService(request.app.database)
     return await service.get(key, query_params)
 

@@ -7,12 +7,13 @@ from app.model.dto import RoleDTO, PlayTaskDTO, RoleLevelDTO, RolePlayDTO, Chall
 from app.model.type import StudentLevel, RoleStudent
 from app.service.service import Service
 from app.service.user_service import UserService
+from database.collections import Table
 
 
 class RolePlayService(Service[RoleDTO]):
     def __init__(self, db: AsyncDatabase):
         self.db = db
-        super().__init__(self.db.get_collection("role_play"))
+        super().__init__(self.db.get_collection(Table.ROLE_PLAY.__str__()))
 
     async def get(self, key: str | None, params: dict = {}) -> RoleDTO | list[RoleDTO] | None:
         if key:

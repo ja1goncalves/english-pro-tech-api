@@ -1,16 +1,16 @@
 from enum import Enum
 
-class UserProfile(Enum):
+class UserProfile(str, Enum):
     ADMIN = 'admin'
     STUDENT = 'student'
 
-class RoleStudent(Enum):
+class RoleStudent(str, Enum):
     JR = 'JR'
     PL = 'PL'
     SR = 'SR'
     TL = 'TL'
 
-class StudentLevel(Enum):
+class StudentLevel(str, Enum):
     JR1 = 'JR#1'
     JR2 = 'JR#2'
     JR3 = 'JR#3'
