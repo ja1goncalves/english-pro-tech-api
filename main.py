@@ -14,7 +14,12 @@ async def lifespan(app: FastAPI):
     # Close the database connection
     await conn.shutdown_db_client()
 
-app = FastAPI(lifespan=lifespan, swagger_ui_parameters={"syntaxHighlight": {"theme": "obsidian"}})
+app = FastAPI(
+    title="EnglishProTech API",
+    version="1.0.0",
+    lifespan=lifespan,
+    swagger_ui_parameters={"syntaxHighlight": {"theme": "obsidian"}}
+)
 app.add_middleware(AuthMiddleware)
 
 @app.get("/")

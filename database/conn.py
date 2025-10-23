@@ -52,8 +52,19 @@ class Connection:
             admin = {
                 "username": "admin",
                 "email": "admin@admin.com",
-                "password": get_password_hash(settings.DB_NAME),
+                "password": get_password_hash(settings.ADMIN_PASSWORD),
                 "name": "Admin User",
                 "profile": UserProfile.ADMIN
             };
             await user_collection.insert_one(admin)
+        else:
+            await user_collection.update_one(
+                {"username": "admin"},
+                {
+                    "$set": {
+                        "password": get_password_hash(settings.ADMIN_PASSWORD),
+                        "profile": UserProfile.ADMIN
+                    }
+                },
+                upsert=True
+            )

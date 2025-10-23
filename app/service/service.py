@@ -19,7 +19,7 @@ class Service(Generic[T]):
 
     async def update(self, data) -> bool:
         update_result = await self.repository.update(data)
-        return update_result.modified_count == 1
+        return update_result is not None
 
     async def remove(self, key: str) -> bool:
         delete_result = await self.repository.remove(key)

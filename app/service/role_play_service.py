@@ -13,7 +13,7 @@ from database.collections import Table
 class RolePlayService(Service[RoleDTO]):
     def __init__(self, db: AsyncDatabase):
         self.db = db
-        super().__init__(self.db.get_collection(Table.ROLE_PLAY.__str__()))
+        super().__init__(self.db.get_collection(Table.ROLE_PLAY))
 
     async def get(self, key: str | None, params: dict = {}) -> RoleDTO | list[RoleDTO] | None:
         if key:

@@ -36,10 +36,10 @@ async def validate_token(db: AsyncDatabase, token: str) -> UserBase:
         user_collection = db.get_collection("user")
     except jwt.PyJWTError:
         raise ForbiddenError()
-    user = user_collection.find({"username": username}).limit(1)[0]
+    user = await user_collection.find_one({"username": username})
     if user is None:
         raise ForbiddenError("Invalid token or user does not exist")
-    return user
+    return UserBase(**user)
 
 def test_password_hashing():
     plain_password = "superduper"

@@ -16,10 +16,10 @@ from database.collections import Table
 class AuthService(Service[UserDTO]):
     def __init__(self, db: AsyncDatabase):
         self.db = db
-        super().__init__(db.get_collection(Table.USER.__str__()))
+        super().__init__(db.get_collection(Table.USER))
 
     async def login(self, username: str, password: str) -> TokenDTO:
-        user: UserBase = await self.collection.find_one({"username": username})
+        user = UserBase(**await self.collection.find_one({"username": username}))
         if not user or (user and not verify_password(password, user.password)):
             raise CredentialsError()
 
@@ -34,10 +34,9 @@ class AuthService(Service[UserDTO]):
         if not updated_user:
             raise UpdateError("Token was not updated")
 
-        return TokenDTO(access_token=access_token, token_type="bearer")
+        return TokenDTO(access_token=access_token, token_type="Bearer")
 
-    async def logout(self, username: str) -> None:
-        user: UserBase = await self.collection.find_one({"username": username})
+    async def logout(self, user: UserBase) -> None:
         if not user:
             raise ForbiddenError("User not found")
 

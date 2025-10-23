@@ -22,7 +22,7 @@ class Repository(Generic[T]):
     async def update(self, data) -> T | None:
         return await self.collection.find_one_and_update(
             {"_id": ObjectId(data.id)},
-            {"$set": data},
+            {"$set": data.model_dump(by_alias=True, exclude={"id"})},
             return_document=ReturnDocument.AFTER
         )
 

@@ -12,8 +12,7 @@ router = APIRouter()
 @router.post("/token", response_model=TokenDTO)
 async def login(request: Request, body: OAuth2PasswordRequestForm = Depends()):
     try:
-        username, password = body
-        return await AuthService(request.app).login(username, password)
+        return await AuthService(request.app.database).login(body.username, body.password)
     except CredentialsError as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -26,11 +25,17 @@ async def login(request: Request, body: OAuth2PasswordRequestForm = Depends()):
             detail="Token was not updated",
             headers={"WWW-Authenticate": "Bearer"}
         )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=e.__str__(),
+            headers={"WWW-Authenticate": "Bearer"}
+        )
 
 @router.delete("/", response_model=None)
 async def logout(request: Request):
     try:
-        return await AuthService(request.app).logout(request.state.user)
+        return await AuthService(request.app.database).logout(request.state.user)
     except ForbiddenError as e:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -47,7 +52,7 @@ async def logout(request: Request):
 @router.post("/reset-password", response_model=None)
 async def ask_new_password(request: Request, body: AskResetPasswordDTO):
     try:
-        return await AuthService(request.app).ask_new_password(body)
+        return await AuthService(request.app.database).ask_new_password(body)
     except ForbiddenError as e:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -66,7 +71,7 @@ async def reset_password(request: Request, body: ResetPasswordDTO, query_params 
             )
 
         token = query_params.get("token")
-        return await AuthService(request.app).reset_password(token, body)
+        return await AuthService(request.app.database).reset_password(token, body)
     except ForbiddenError as e:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
