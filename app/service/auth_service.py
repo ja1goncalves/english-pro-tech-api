@@ -47,7 +47,7 @@ class AuthService(Service[UserDTO]):
 
     async def ask_new_password(self, body: AskResetPasswordDTO) -> bool:
         body_field = body.model_dump(by_alias=True)
-        user: UserBase = await self.collection.find(body_field).limit(1)[0]
+        user = UserBase(**await self.collection.find_one(body_field))
         if not user:
             raise ForbiddenError("User not found")
 

@@ -1,10 +1,12 @@
+from typing import List
+
 from app.exception.exception import RoleLevelError
 from app.model.entity import UserBase
 from app.service.gen_ia_service import GenIAService
 from app.util.role_play import role_enable, get_code_level, get_story_play, is_story_play, new_story_play
 from pymongo.asynchronous.database import AsyncDatabase
-from app.model.dto import RoleDTO, PlayTaskDTO, RoleLevelDTO, RolePlayDTO, ChallengeDTO
-from app.model.type import StudentLevel, RoleStudent
+from app.model.dto import RoleDTO, PlayTaskDTO, RoleLevelDTO, RolePlayDTO, ChallengeDTO, UserDTO
+from app.model.type import StudentLevel, RoleStudent, UserProfile
 from app.service.service import Service
 from app.service.user_service import UserService
 from database.collections import Table
@@ -15,26 +17,31 @@ class RolePlayService(Service[RoleDTO]):
         self.db = db
         super().__init__(self.db.get_collection(Table.ROLE_PLAY))
 
-    async def get(self, key: str | None, params: dict = {}) -> RoleDTO | list[RoleDTO] | None:
+    async def get(self, key: str | None, params: dict = {}) -> RoleDTO | List[RoleDTO] | None:
         if key:
-            return await super().get(key)
+            return RoleDTO(**await super().get(key))
         return await super().all(
             params,
             params["limit"] if "limit" in params else 1000,
             params["offset"] if "offset" in params else 0
         )
 
-    async def get_by_user(self, user: UserBase) -> list[RoleDTO] | None:
+    async def get_by_user(self, user: UserBase) -> List[RoleDTO] | None:
+        if user.profile is UserProfile.ADMIN:
+            return await super().all()
+
         user_service = UserService(self.db)
-        user_db = await user_service.get(user.id)
+        user_db = await user_service.get(str(user.id))
         user_code, user_level = get_code_level(user_db)
         enable_roles = role_enable(user_db)
 
         roles = await super().all()
         for role in roles:
             role["disabled"] = user_code not in enable_roles
-            for role_level in role.level:
+            for role_level in role["level"]:
                 role_level["disabled"] = user_level < role_level
+
+        return roles
 
     async def play_task(self, user: UserBase, data: PlayTaskDTO) -> ChallengeDTO:
         role: RoleDTO = await self.get(data.role_id)
@@ -49,17 +56,14 @@ class RolePlayService(Service[RoleDTO]):
             gen_ia_service = GenIAService(user)
 
             if not user_role_play:
-                question, response = await gen_ia_service.init_play(role, level, play)
-                res = ChallengeDTO(question=question, response=response, xp=0)
-                finished = await self.update_user_role_play(user, role.code, level.step, data.play_id, res)
-                res.update_level = finished
-                return res
+                xp, question, response = await gen_ia_service.init_play(role, level, play)
             else:
                 xp, question, response = await gen_ia_service.answer_play(data.answer, user_role_play, role, level, play)
-                res = ChallengeDTO(question=question, response=response, xp=xp)
-                finished = await self.update_user_role_play(user, role.code, level.step, data.play_id, res)
-                res.update_level = finished
-                return res
+
+            res = ChallengeDTO(question=question, response=response, xp=0)
+            finished = await self.update_user_role_play(user, role.code, level.step, data.play_id, res)
+            res.update_level = finished
+            return res
         else:
             raise RoleLevelError("User role does not match the requested role play")
 

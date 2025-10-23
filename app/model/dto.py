@@ -1,6 +1,9 @@
-from pydantic import BaseModel, EmailStr
+import uuid
+
+from bson import ObjectId
+from pydantic import BaseModel, EmailStr, ConfigDict, Field
 from typing import Optional, List
-from datetime import datetime
+from datetime import datetime, UTC
 
 from app.model.entity import UserPlayStory
 from app.model.type import UserProfile, RoleStudent, StudentLevel
@@ -10,6 +13,7 @@ class ChallengeDTO(BaseModel):
     response: str
     xp: int
     update_level: Optional[bool] = False
+    created_at: datetime = datetime.now(UTC)
 
 class LoginDTO(BaseModel):
     username: str
@@ -28,29 +32,44 @@ class ResetPasswordDTO(BaseModel):
     confirm_password: str
 
 class RolePlayDTO(BaseModel):
-    id: str
+    id: ObjectId = Field(default_factory=uuid.uuid4, alias="_id")
     challenge: str
     xp: int = 0
     description: Optional[str] = None
     metadata: Optional[List[dict]] = None
     disabled: Optional[bool] = True
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True,
+        json_encoders={ObjectId: str}
+    )
 
 class RoleLevelDTO(BaseModel):
-    id: Optional[str]
+    id: ObjectId = Field(default_factory=uuid.uuid4, alias="_id")
     step: int = 1
     min_xp: int
     max_xp: int
     plays: Optional[List[RolePlayDTO]] = []
     disabled: Optional[bool] = False
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True,
+        json_encoders={ObjectId: str}
+    )
 
 class RoleDTO(BaseModel):
-    id: Optional[str]
+    id: ObjectId = Field(default_factory=uuid.uuid4, alias="_id")
     code: RoleStudent
     name: str
     min_xp: int = 0
     max_xp: int = 0
     level: Optional[List[RoleLevelDTO]] = []
     disabled: Optional[bool] = True
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True,
+        json_encoders={ObjectId: str}
+    )
 
 class PlayTaskDTO(BaseModel):
     role_id: str
@@ -59,7 +78,7 @@ class PlayTaskDTO(BaseModel):
     answer: Optional[str] = None
 
 class UserDTO(BaseModel):
-    id: str
+    id: ObjectId = Field(default_factory=uuid.uuid4, alias="_id")
     username: str
     email: EmailStr = None
     name: str = None
@@ -70,6 +89,11 @@ class UserDTO(BaseModel):
     play_story: Optional[List[UserPlayStory]] = None
     token: Optional[str] = None
     created_at: Optional[datetime] = None
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True,
+        json_encoders={ObjectId: str}
+    )
 
 class UserCreateDTO(BaseModel):
     username: str

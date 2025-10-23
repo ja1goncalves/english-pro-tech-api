@@ -20,5 +20,5 @@ async def put_user(request: Request, body: UserUpdateDTO):
 @router.get("/me", response_model=UserDTO)
 async def get_user(request: Request):
     service = UserService(request.app.database)
-    request.state.user = await service.get(request.state.user.id)
+    request.state.user = await service.get(str(request.state.user.id))
     return request.state.user

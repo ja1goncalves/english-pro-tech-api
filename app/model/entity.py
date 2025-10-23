@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, UTC
 from bson import ObjectId
 from pydantic import BaseModel, Field, EmailStr, ConfigDict
 from typing import Optional, List
@@ -11,6 +11,7 @@ class Challenge(BaseModel):
     response: str
     xp: int
     update_level: Optional[bool] = False
+    created_at: datetime = datetime.now(UTC).isoformat()
 
 class RolePlay(BaseModel):
     id: ObjectId = Field(default_factory=uuid.uuid4, alias="_id")
@@ -64,16 +65,16 @@ class UserPlayStory(BaseModel):
 class UserBase(BaseModel):
     id: ObjectId = Field(default_factory=uuid.uuid4, alias="_id")
     username: str
-    email: EmailStr = None
+    email: EmailStr
     password: str
-    name: str = None
+    name: str = 'User'
     profile: UserProfile = UserProfile.STUDENT
     document: Optional[str] = None
     level: Optional[StudentLevel] = None
     xp: Optional[int] = 0
-    play_story: Optional[List[UserPlayStory]] = None
+    play_story: Optional[List[UserPlayStory]] = []
     token: Optional[str] = None
-    created_at: Optional[datetime] = None
+    created_at: datetime = datetime.now(UTC)
     model_config = ConfigDict(
         populate_by_name=True,
         arbitrary_types_allowed=True,

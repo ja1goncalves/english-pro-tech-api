@@ -17,7 +17,7 @@ class GenIAService:
         self.gen_ia = GenAIAPI(self.system_message)
 
     async def init_play(self, role: RoleDTO | Role, level: RoleLevelDTO | RoleLevel,
-                        task: RolePlayDTO | RolePlay) -> Tuple[str, str]:
+                        task: RolePlayDTO | RolePlay) -> Tuple[int, str, str]:
         role_name = role.name
         level = level.step
         challenge = task.challenge
@@ -28,7 +28,7 @@ class GenIAService:
         de nível técnico {level}, em que {challenge} onde {description} para que eu possa melhorar minhas habilidades
         em inglês técnico. Use as seguintes informações adicionais para tornar o desafio mais relevante: {metadata}"""
 
-        return question, self.gen_ia.send_prompt(question)
+        return 0, question, self.gen_ia.send_prompt(question)
 
     async def answer_play(self, answer: str, story: list[UserPlayStory],
                           role: RoleDTO | Role, level: RoleLevelDTO | RoleLevel,

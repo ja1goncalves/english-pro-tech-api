@@ -30,4 +30,4 @@ class Repository(Generic[T]):
         return await self.collection.delete_one({"_id": ObjectId(key)})
 
     async def all(self, data_filter, limit = 100, offset = 0) -> list[T]:
-        return list(await self.collection.find(data_filter).skip(offset).limit(limit))
+        return list(await self.collection.find(data_filter).skip(offset).limit(limit).to_list(length=limit))
