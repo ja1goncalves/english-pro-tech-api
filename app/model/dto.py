@@ -31,6 +31,28 @@ class ResetPasswordDTO(BaseModel):
     password: str
     confirm_password: str
 
+class RolePlayCreateDTO(BaseModel):
+    challenge: str
+    xp: int = 0
+    description: Optional[str] = None
+    metadata: Optional[List[dict]] = None
+
+class RoleLevelCreateDTO(BaseModel):
+    step: int = 1
+    min_xp: int
+    max_xp: int
+    plays: Optional[List[RolePlayCreateDTO]] = []
+
+class RoleCreateDTO(BaseModel):
+    code: RoleStudent
+    name: str
+    min_xp: int = 0
+    max_xp: int = 0
+    level: Optional[List[RoleLevelCreateDTO]] = []
+
+class RoleUpdateDTO(RoleCreateDTO):
+    id: str
+
 class RolePlayDTO(BaseModel):
     id: ObjectId = Field(default_factory=uuid.uuid4, alias="_id")
     challenge: str
@@ -71,6 +93,11 @@ class RoleDTO(BaseModel):
         json_encoders={ObjectId: str}
     )
 
+class RoleQueryFilter(BaseModel):
+    id: Optional[str] = None
+    code: Optional[RoleStudent] = None
+    name: Optional[str] = Field(default_factory=str)
+
 class PlayTaskDTO(BaseModel):
     role_id: str
     level_id: str
@@ -86,14 +113,24 @@ class UserDTO(BaseModel):
     document: Optional[str] = None
     level: Optional[StudentLevel] = None
     xp: Optional[int] = 0
-    play_story: Optional[List[UserPlayStory]] = None
-    token: Optional[str] = None
-    created_at: Optional[datetime] = None
+    play_story: Optional[List[UserPlayStory]] = []
+    created_at: datetime = datetime.now(UTC)
     model_config = ConfigDict(
         populate_by_name=True,
         arbitrary_types_allowed=True,
         json_encoders={ObjectId: str}
     )
+
+class UserQueryFilter(BaseModel):
+    id: Optional[str] = None
+    username: Optional[str] = None
+    email: Optional[EmailStr] = None
+    name: Optional[str] = Field(default_factory=str)
+    profile: Optional[UserProfile] = None
+    document: Optional[str] = None
+    level: Optional[StudentLevel] = None
+    limit: Optional[int] = Field(100, gt=0, le=100)
+    offset: Optional[int] = Field(0, ge=0)
 
 class UserCreateDTO(BaseModel):
     username: str
@@ -105,5 +142,6 @@ class UserCreateDTO(BaseModel):
     level: Optional[StudentLevel]
 
 class UserUpdateDTO(UserCreateDTO):
-    _id: str
+    id: str
     xp: Optional[int]
+    password: Optional[int] = None

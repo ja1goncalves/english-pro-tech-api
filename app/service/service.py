@@ -23,7 +23,13 @@ class Service(Generic[T]):
 
     async def remove(self, key: str) -> bool:
         delete_result = await self.repository.remove(key)
-        return delete_result.deleted_count == 1
+        return delete_result is not None
 
     async def all(self, data_filter = {}, limit = 100, offset = 0) -> list[T]:
         return await self.repository.all(data_filter, limit, offset)
+
+    async def filtering(self, params: dict) -> list[dict]:
+        limit = params["limit"] if "limit" in params else 100
+        offset = params["offset"] if "offset" in params else 0
+        filter_params = {k: v for k, v in params.items() if k not in ["limit", "offset"] and v not in [None, '']}
+        return await self.all(filter_params, limit, offset)

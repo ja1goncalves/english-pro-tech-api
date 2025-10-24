@@ -5,7 +5,7 @@ from app.model.entity import UserBase
 from app.service.gen_ia_service import GenIAService
 from app.util.role_play import role_enable, get_code_level, get_story_play, is_story_play, new_story_play
 from pymongo.asynchronous.database import AsyncDatabase
-from app.model.dto import RoleDTO, PlayTaskDTO, RoleLevelDTO, RolePlayDTO, ChallengeDTO, UserDTO
+from app.model.dto import RoleDTO, PlayTaskDTO, RoleLevelDTO, RolePlayDTO, ChallengeDTO, UserDTO, RoleQueryFilter
 from app.model.type import StudentLevel, RoleStudent, UserProfile
 from app.service.service import Service
 from app.service.user_service import UserService
@@ -17,14 +17,13 @@ class RolePlayService(Service[RoleDTO]):
         self.db = db
         super().__init__(self.db.get_collection(Table.ROLE_PLAY))
 
-    async def get(self, key: str | None, params: dict = {}) -> RoleDTO | List[RoleDTO] | None:
-        if key:
-            return RoleDTO(**await super().get(key))
-        return await super().all(
-            params,
-            params["limit"] if "limit" in params else 1000,
-            params["offset"] if "offset" in params else 0
-        )
+    async def get(self, query_params: RoleQueryFilter) -> RoleDTO | List[RoleDTO] | None:
+        params = query_params.model_dump(by_alias=True)
+        if "id" in params and params["id"] is not None:
+            return RoleDTO(**await super().get(params["id"]))
+
+        roles = await self.filtering(params)
+        return [RoleDTO(**role) for role in roles]
 
     async def get_by_user(self, user: UserBase) -> List[RoleDTO] | None:
         if user.profile is UserProfile.ADMIN:
