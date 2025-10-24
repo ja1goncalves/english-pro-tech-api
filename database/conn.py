@@ -6,6 +6,7 @@ from app.model.type import UserProfile
 from app.util.config import settings
 from pymongo import AsyncMongoClient
 
+from app.util.role_play import play_code
 from app.util.security import get_password_hash
 from database.collections import Table
 
@@ -40,9 +41,17 @@ class Connection:
         with open("./database/role_play.json", "r") as f:
             initial_roles = json.load(f)
             if existing_roles == 0:
+                for role in initial_roles["role"]:
+                    for level in role["level"]:
+                        for i, p in enumerate(level["plays"]):
+                            p["code"] = play_code(role['code'], level['step'], i)
+
                 await roles_collection.insert_many(initial_roles["role"])
             else:
                 for role in initial_roles["role"]:
+                    for level in role["level"]:
+                        for i, p in enumerate(level["plays"]):
+                            p["code"] = play_code(role['code'], level['step'], i)
                     await roles_collection.update_one({"code": role["code"]}, {"$set": role}, upsert=True)
 
 

@@ -54,7 +54,7 @@ class RoleUpdateDTO(RoleCreateDTO):
     id: str
 
 class RolePlayDTO(BaseModel):
-    id: ObjectId = Field(default_factory=uuid.uuid4, alias="_id")
+    code: str
     challenge: str
     xp: int = 0
     description: Optional[str] = None
@@ -67,7 +67,6 @@ class RolePlayDTO(BaseModel):
     )
 
 class RoleLevelDTO(BaseModel):
-    id: ObjectId = Field(default_factory=uuid.uuid4, alias="_id")
     step: int = 1
     min_xp: int
     max_xp: int
@@ -100,8 +99,8 @@ class RoleQueryFilter(BaseModel):
 
 class PlayTaskDTO(BaseModel):
     role_id: str
-    level_id: str
-    play_id: str
+    level_num: int
+    play_code: str
     answer: Optional[str] = None
 
 class UserDTO(BaseModel):

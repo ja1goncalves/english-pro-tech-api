@@ -31,9 +31,9 @@ async def play_task(request: Request, play: PlayTaskDTO):
             detail="Decoding GEnAI response error",
             headers={"WWW-Authenticate": "Bearer"}
         )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Some internal error occurred",
-            headers={"WWW-Authenticate": "Bearer"}
-        )
+    # except Exception as e:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+    #         detail="Some internal error occurred",
+    #         headers={"WWW-Authenticate": "Bearer"}
+    #     )

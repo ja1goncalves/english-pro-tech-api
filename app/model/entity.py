@@ -14,7 +14,7 @@ class Challenge(BaseModel):
     created_at: datetime = datetime.now(UTC).isoformat()
 
 class RolePlay(BaseModel):
-    id: ObjectId = Field(default_factory=uuid.uuid4, alias="_id")
+    code: str
     challenge: str
     xp: int = 0
     description: Optional[str] = None
@@ -26,10 +26,10 @@ class RolePlay(BaseModel):
     )
 
 class RoleLevel(BaseModel):
-    id: ObjectId = Field(default_factory=uuid.uuid4, alias="_id")
     step: int = 1
     min_xp: int
     max_xp: int
+    plays: Optional[List[RolePlay]] = []
     model_config = ConfigDict(
         populate_by_name=True,
         arbitrary_types_allowed=True,
@@ -50,10 +50,9 @@ class Role(BaseModel):
     )
 
 class UserPlayStory(BaseModel):
-    id: ObjectId = Field(default_factory=uuid.uuid4, alias="_id")
     role: RoleStudent = RoleStudent.JR
     level_step: int = 1
-    play_id: str
+    play_code: str
     xp: int = 0
     metadata: Optional[List[Challenge]] = []
     model_config = ConfigDict(

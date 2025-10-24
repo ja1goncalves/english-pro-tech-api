@@ -41,7 +41,7 @@ async def get_role_play(request: Request, query_params: Annotated[RoleQueryFilte
 @role_play_router.post("/", response_model=RoleDTO)
 async def add_role_play(request: Request, body: RoleCreateDTO):
     service = RolePlayService(request.app.database)
-    return await service.add(body)
+    return await service.add(body) # need create a role_play add to build the play code
 
 @role_play_router.put("/", response_model=None)
 async def put_role_play(request: Request, body: RoleUpdateDTO):

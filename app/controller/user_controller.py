@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Body, Request, Response, HTTPException, status
-from app.model.dto import UserDTO, UserCreateDTO, UserUpdateDTO
+from app.model.dto import UserDTO, UserCreateDTO, UserUpdateDTO, UserQueryFilter
 from app.model.type import UserProfile
 from app.service.user_service import UserService
 
@@ -12,7 +12,7 @@ async def add_user(request: Request, user: UserCreateDTO):
     user.profile = UserProfile.STUDENT
     return await service.add(user)
 
-@router.put("/", response_model=UserDTO)
+@router.put("/", response_model=None)
 async def put_user(request: Request, body: UserUpdateDTO):
     service = UserService(request.app.database)
     return await service.update(body)
@@ -20,5 +20,5 @@ async def put_user(request: Request, body: UserUpdateDTO):
 @router.get("/me", response_model=UserDTO)
 async def get_user(request: Request):
     service = UserService(request.app.database)
-    request.state.user = await service.get(str(request.state.user.id))
+    request.state.user = await service.get(UserQueryFilter(id=str(request.state.user.id), limit=1, offset=0))
     return request.state.user

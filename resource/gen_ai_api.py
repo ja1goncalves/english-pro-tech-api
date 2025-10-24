@@ -37,5 +37,5 @@ class GenAIAPI:
             except json.JSONDecodeError as e:
                 print(f"Decodification JSON Error: {e}")
         else:
-            print(f"Error: {response.status_code}")
+            print(f"Error: {response.status_code}: {response.text}")
             return None

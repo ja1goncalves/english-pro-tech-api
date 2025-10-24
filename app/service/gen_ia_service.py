@@ -19,13 +19,13 @@ class GenIAService:
     async def init_play(self, role: RoleDTO | Role, level: RoleLevelDTO | RoleLevel,
                         task: RolePlayDTO | RolePlay) -> Tuple[int, str, str]:
         role_name = role.name
-        level = level.step
+        step = level.step
         challenge = task.challenge
         description = task.description or "Explore pontos técnicos relevantes"
         metadata = task.metadata
 
         question = f"""Por favor, elabore um desafio prático personalizado, para o nível de desenvolvimento {role_name}
-        de nível técnico {level}, em que {challenge} onde {description} para que eu possa melhorar minhas habilidades
+        de nível técnico {step}, em que {challenge} onde {description} para que eu possa melhorar minhas habilidades
         em inglês técnico. Use as seguintes informações adicionais para tornar o desafio mais relevante: {metadata}"""
 
         return 0, question, self.gen_ia.send_prompt(question)
@@ -34,13 +34,13 @@ class GenIAService:
                           role: RoleDTO | Role, level: RoleLevelDTO | RoleLevel,
                           task: RolePlayDTO | RolePlay) -> Tuple[int, str, str]:
         role_name = role.name
-        level = level.step
+        step = level.step
         challenge = task.challenge
         description = task.description or "Explore pontos técnicos relevantes"
         metadata = task.metadata
 
         self.system_message += f"""Para isso, leve em consideração que estou no nível de desenvolvimento {role_name}
-        de nível técnico {level}, no desafio '{challenge}' onde {description} para que eu possa melhorar minhas habilidades
+        de nível técnico {step}, no desafio '{challenge}' onde {description} para que eu possa melhorar minhas habilidades
         em inglês técnico e que já tive o seguinte histórico de progresso em outros desafios: {story_play_str(story)}.
         Use as seguintes informações adicionais para tornar o desafio mais relevante: {metadata}"""
 
