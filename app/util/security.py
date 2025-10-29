@@ -1,14 +1,24 @@
 from datetime import datetime, timedelta, UTC
 from typing import Optional
 import jwt
+from fastapi import HTTPException, status
 from pymongo.asynchronous.database import AsyncDatabase
-
+from starlette.requests import Request
 from app.exception.exception import ForbiddenError
 from app.model.entity import UserBase
+from app.model.type import UserProfile
 from app.util.config import settings
 from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def is_admin(request: Request):
+    if request.state.user.profile is not UserProfile.ADMIN:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Administrative privileges required",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)

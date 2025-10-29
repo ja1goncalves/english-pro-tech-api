@@ -5,9 +5,10 @@ from app.model.dto import UserCreateDTO, UserDTO, UserUpdateDTO, RoleDTO, UserQu
     RoleCreateDTO, RoleUpdateDTO
 from app.service.role_play_service import RolePlayService
 from app.service.user_service import UserService
+from app.util.security import is_admin
 
 prefix = "/v1/admin"
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(is_admin)])
 
 user_router = APIRouter()
 
