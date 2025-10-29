@@ -1,11 +1,9 @@
 import uuid
-
-from bson import ObjectId
-from pydantic import BaseModel, EmailStr, ConfigDict, Field
+from pydantic import BaseModel, EmailStr, Field
 from typing import Optional, List
 from datetime import datetime, UTC
-
 from app.model.entity import UserPlayStory
+from app.model.pydantic_object_id import PydanticObjectId
 from app.model.type import UserProfile, RoleStudent, StudentLevel
 
 class ChallengeDTO(BaseModel):
@@ -70,18 +68,13 @@ class RoleLevelDTO(BaseModel):
     disabled: Optional[bool] = False
 
 class RoleDTO(BaseModel):
-    id: ObjectId = Field(default_factory=uuid.uuid4, alias="_id")
+    id: PydanticObjectId = Field(default_factory=uuid.uuid4, alias="_id")
     code: RoleStudent
     name: str
     min_xp: int = 0
     max_xp: int = 0
     level: Optional[List[RoleLevelDTO]] = []
     disabled: Optional[bool] = True
-    model_config = ConfigDict(
-        populate_by_name=True,
-        arbitrary_types_allowed=True,
-        json_encoders={ObjectId: str}
-    )
 
 class RoleQueryFilter(BaseModel):
     id: Optional[str] = None
@@ -95,7 +88,7 @@ class PlayTaskDTO(BaseModel):
     answer: Optional[str] = None
 
 class UserDTO(BaseModel):
-    id: ObjectId = Field(default_factory=uuid.uuid4, alias="_id")
+    id: PydanticObjectId = Field(default_factory=uuid.uuid4, alias="_id")
     username: str
     email: EmailStr = None
     name: str = None
@@ -105,11 +98,6 @@ class UserDTO(BaseModel):
     xp: Optional[int] = 0
     play_story: Optional[List[UserPlayStory]] = []
     created_at: datetime = datetime.now(UTC)
-    model_config = ConfigDict(
-        populate_by_name=True,
-        arbitrary_types_allowed=True,
-        json_encoders={ObjectId: str}
-    )
 
 class UserQueryFilter(BaseModel):
     id: Optional[str] = None

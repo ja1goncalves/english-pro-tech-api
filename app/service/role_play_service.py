@@ -29,7 +29,7 @@ class RolePlayService(Service[RoleDTO]):
     async def add(self, data: RoleCreateDTO) -> RoleDTO:
         for level in data.level:
             for i, p in enumerate(level.plays):
-                p.code = p.code if p.code else play_code(data.code, level.step, i)
+                p.code = p.code if p.code else play_code(data.code.value, level.step, i)
         role = Role(**data.model_dump(by_alias=True))
 
         return RoleDTO(**await super().add(role))
@@ -68,7 +68,7 @@ class RolePlayService(Service[RoleDTO]):
             else:
                 xp, question, response = await gen_ia_service.answer_play(data.answer, user_role_play, role, level, play)
 
-            res = ChallengeDTO(question=question, response=response, xp=0)
+            res = ChallengeDTO(question=question, response=response, xp=xp)
             finished = await self.update_user_role_play(user, role.code, level.step, data.play_code, res)
             res.update_level = finished
             return res

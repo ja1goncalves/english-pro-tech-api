@@ -43,7 +43,7 @@ def new_story_play(user: UserBase, role_code: RoleStudent, role_level: int, code
 def story_play_str(story: list[UserPlayStory]) -> str:
     story_str = ""
     for s in story:
-        metadata_str = "; ".join([f"Usuário: '{m.question}' e Feedback: '{m.response}' com {m.xp} de XP. " for m in s.metadata]) if s.metadata else ""
-        story_str += f"Role: {s.role}, Level: {s.level_step}, Play ID: {s.play_id}, XP: {s.xp}.\nHistórico de conversa: {metadata_str}."
+        metadata_str = "; ".join([f"User question: '{m.question}' and Feedback: '{m.response}' with {m.xp}XP. " for m in s.metadata]) if s.metadata else ""
+        story_str += f"Role: {s.role}, Level: {s.level_step}, Play ID: {s.play_code}, XP: {s.xp}.\nChat Story: {metadata_str}."
 
     return story_str
