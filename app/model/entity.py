@@ -19,22 +19,12 @@ class RolePlay(BaseModel):
     xp: int = 0
     description: Optional[str] = None
     metadata: Optional[List[dict]] = None
-    model_config = ConfigDict(
-        populate_by_name=True,
-        arbitrary_types_allowed=True,
-        json_encoders={ObjectId: str}
-    )
 
 class RoleLevel(BaseModel):
     step: int = 1
     min_xp: int
     max_xp: int
     plays: Optional[List[RolePlay]] = []
-    model_config = ConfigDict(
-        populate_by_name=True,
-        arbitrary_types_allowed=True,
-        json_encoders={ObjectId: str}
-    )
 
 class Role(BaseModel):
     id: ObjectId = Field(default_factory=uuid.uuid4, alias="_id")
@@ -55,11 +45,6 @@ class UserPlayStory(BaseModel):
     play_code: str
     xp: int = 0
     metadata: Optional[List[Challenge]] = []
-    model_config = ConfigDict(
-        populate_by_name=True,
-        arbitrary_types_allowed=True,
-        json_encoders={ObjectId: str}
-    )
 
 class UserBase(BaseModel):
     id: ObjectId = Field(default_factory=uuid.uuid4, alias="_id")

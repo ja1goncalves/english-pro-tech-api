@@ -1,12 +1,12 @@
 from typing import List
 
 from app.exception.exception import RoleLevelError
-from app.model.entity import UserBase
+from app.model.entity import UserBase, Role
 from app.service.gen_ia_service import GenIAService
-from app.util.role_play import role_enable, get_code_level, get_story_play, is_story_play, new_story_play
+from app.util.role_play import role_enable, get_code_level, get_story_play, is_story_play, new_story_play, play_code
 from pymongo.asynchronous.database import AsyncDatabase
 from app.model.dto import RoleDTO, PlayTaskDTO, RoleLevelDTO, RolePlayDTO, ChallengeDTO, UserDTO, RoleQueryFilter, \
-    UserQueryFilter
+    UserQueryFilter, RoleCreateDTO
 from app.model.type import StudentLevel, RoleStudent, UserProfile
 from app.service.service import Service
 from app.service.user_service import UserService
@@ -25,6 +25,14 @@ class RolePlayService(Service[RoleDTO]):
 
         roles = await self.filtering(params)
         return [RoleDTO(**role) for role in roles]
+
+    async def add(self, data: RoleCreateDTO) -> RoleDTO:
+        for level in data.level:
+            for i, p in enumerate(level.plays):
+                p.code = p.code if p.code else play_code(data.code, level.step, i)
+        role = Role(**data.model_dump(by_alias=True))
+
+        return RoleDTO(**await super().add(role))
 
     async def get_by_user(self, user: UserBase) -> List[RoleDTO] | None:
         if user.profile is UserProfile.ADMIN:

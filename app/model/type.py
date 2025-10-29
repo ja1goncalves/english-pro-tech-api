@@ -9,6 +9,7 @@ class RoleStudent(str, Enum):
     PL = 'PL'
     SR = 'SR'
     TL = 'TL'
+    AT = 'AT'
 
 class StudentLevel(str, Enum):
     JR1 = 'JR#1'
@@ -23,3 +24,6 @@ class StudentLevel(str, Enum):
     TL1 = 'TL#1'
     TL2 = 'TL#2'
     TL3 = 'TL#3'
+    AT1 = 'AT#1'
+    AT2 = 'AT#2'
+    AT3 = 'AT#3'

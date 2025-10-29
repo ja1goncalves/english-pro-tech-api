@@ -32,6 +32,7 @@ class ResetPasswordDTO(BaseModel):
     confirm_password: str
 
 class RolePlayCreateDTO(BaseModel):
+    code: Optional[str] = None
     challenge: str
     xp: int = 0
     description: Optional[str] = None
@@ -60,11 +61,6 @@ class RolePlayDTO(BaseModel):
     description: Optional[str] = None
     metadata: Optional[List[dict]] = None
     disabled: Optional[bool] = True
-    model_config = ConfigDict(
-        populate_by_name=True,
-        arbitrary_types_allowed=True,
-        json_encoders={ObjectId: str}
-    )
 
 class RoleLevelDTO(BaseModel):
     step: int = 1
@@ -72,11 +68,6 @@ class RoleLevelDTO(BaseModel):
     max_xp: int
     plays: Optional[List[RolePlayDTO]] = []
     disabled: Optional[bool] = False
-    model_config = ConfigDict(
-        populate_by_name=True,
-        arbitrary_types_allowed=True,
-        json_encoders={ObjectId: str}
-    )
 
 class RoleDTO(BaseModel):
     id: ObjectId = Field(default_factory=uuid.uuid4, alias="_id")

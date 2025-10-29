@@ -6,7 +6,8 @@ ENABLE_CODES = {
     "JR": ["JR"],
     "PL": ["JR", "PL"],
     "SR": ["JR", "PL", "SR"],
-    "TL": ["JR", "PL", "SR", "TL"]
+    "TL": ["JR", "PL", "SR", "TL"],
+    "AT": ["JR", "PL", "SR", "TL", "AT"]
 }
 
 def play_code(role_code, level_step: int, i: int) -> str:
