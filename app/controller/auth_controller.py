@@ -63,7 +63,7 @@ async def ask_new_password(request: Request, body: AskResetPasswordDTO):
 @router.put("/reset-password", response_model=None)
 async def reset_password(request: Request, body: ResetPasswordDTO, query_params = Depends()):
     try:
-        if body.new_password != body.confirm_password:
+        if body.password != body.confirm_password:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="New password and confirm password do not match",

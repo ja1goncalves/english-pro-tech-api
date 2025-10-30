@@ -29,6 +29,9 @@ class ResetPasswordDTO(BaseModel):
     password: str
     confirm_password: str
 
+class ChangePasswordDTO(ResetPasswordDTO):
+    user_id: str
+
 class RolePlayCreateDTO(BaseModel):
     code: Optional[str] = None
     challenge: str
@@ -119,7 +122,10 @@ class UserCreateDTO(BaseModel):
     document: Optional[str] = None
     level: Optional[StudentLevel]
 
-class UserUpdateDTO(UserCreateDTO):
+class UserUpdateDTO(BaseModel):
     id: str
-    xp: Optional[int]
-    password: Optional[int] = None
+    email: EmailStr | None = None
+    name: str | None = None
+    xp: int | None = None
+    profile: UserProfile | None = None
+    level: StudentLevel | None = None

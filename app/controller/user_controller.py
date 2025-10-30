@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Body, Request, Response, HTTPException, status
+from fastapi import APIRouter, Request
 from app.model.dto import UserDTO, UserCreateDTO, UserUpdateDTO, UserQueryFilter
 from app.model.type import UserProfile
 from app.service.user_service import UserService

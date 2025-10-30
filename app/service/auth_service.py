@@ -56,7 +56,7 @@ class AuthService(Service[UserDTO]):
     async def reset_password(self, token: str, body: ResetPasswordDTO) -> bool:
         user: UserBase = await validate_token(self.db, token)
         if user:
-            user.password = get_password_hash(body.new_password)
+            user.password = get_password_hash(body.password)
             updated_user = await self.update(user)
             if not updated_user:
                 raise UpdateError("Password was not updated")

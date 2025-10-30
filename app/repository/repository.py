@@ -1,4 +1,5 @@
 from bson import ObjectId
+from pydantic import BaseModel
 from pymongo.asynchronous.collection import AsyncCollection, ReturnDocument
 from typing import TypeVar, Generic, Any, Coroutine
 
@@ -19,7 +20,7 @@ class Repository(Generic[T]):
         data = await self.collection.insert_one(data)
         return await self.collection.find_one({"_id": data.inserted_id})
 
-    async def update(self, data) -> T | None:
+    async def update(self, data: BaseModel) -> T | None:
         return await self.collection.find_one_and_update(
             {"_id": ObjectId(data.id)},
             {"$set": data.model_dump(by_alias=True, exclude={"id"})},

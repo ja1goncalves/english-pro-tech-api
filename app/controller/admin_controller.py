@@ -1,8 +1,8 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Body, Request, Query
+from fastapi import APIRouter, Depends, Request, Query, HTTPException, status
 from app.model.dto import UserCreateDTO, UserDTO, UserUpdateDTO, RoleDTO, UserQueryFilter, RoleQueryFilter, \
-    RoleCreateDTO, RoleUpdateDTO
+    RoleCreateDTO, RoleUpdateDTO, ChangePasswordDTO
 from app.service.role_play_service import RolePlayService
 from app.service.user_service import UserService
 from app.util.security import is_admin
@@ -26,6 +26,17 @@ async def add_user(request: Request, body: UserCreateDTO):
 async def put_user(request: Request, body: UserUpdateDTO):
     service = UserService(request.app.database)
     return await service.update(body)
+
+@user_router.put("/change-password", response_model=None)
+async def edit_password_user(request: Request, body: ChangePasswordDTO):
+    if body.password != body.confirm_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password and confirm password do not match",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+    service = UserService(request.app.database)
+    return await service.change_password(body.user_id, body.password)
 
 @user_router.delete("/{key}", response_model=None)
 async def del_user(request: Request, key: str):

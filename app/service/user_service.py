@@ -2,7 +2,7 @@ from copy import deepcopy
 from datetime import datetime, UTC
 
 from pymongo.asynchronous.database import AsyncDatabase
-from app.model.dto import UserDTO, UserCreateDTO, UserQueryFilter
+from app.model.dto import UserDTO, UserCreateDTO, UserQueryFilter, UserUpdateDTO, ChangePasswordDTO
 from app.model.entity import UserBase
 from app.model.type import UserProfile, StudentLevel
 from app.service.service import Service, T
@@ -31,3 +31,17 @@ class UserService(Service[UserDTO]):
         user.password = get_password_hash(data.password)
         user.created_at = datetime.now(UTC)
         return UserDTO(**await super().add(user))
+
+    async def update(self, data: UserUpdateDTO) -> bool:
+        user = await self.get(UserQueryFilter(id=data.id, limit=1, offset=0))
+
+        for k, v in data.model_dump(by_alias=True).items():
+            if v is not None:
+                setattr(user, k, v)
+
+        return await super().update(user)
+
+    async def change_password(self, user_id: str, new_password: str) -> bool:
+        user = (await self.get(UserQueryFilter(id=user_id, limit=1, offset=0))).model_dump(by_alias=True)
+        user["password"] = get_password_hash(new_password)
+        return await super().update(UserBase(**user))
