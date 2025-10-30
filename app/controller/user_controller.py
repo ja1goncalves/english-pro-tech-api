@@ -15,7 +15,7 @@ async def add_user(request: Request, user: UserCreateDTO):
 @router.put("/", response_model=None)
 async def put_user(request: Request, body: UserUpdateDTO):
     service = UserService(request.app.database)
-    return await service.update(body)
+    return await service.user_update(body)
 
 @router.get("/me", response_model=UserDTO)
 async def get_user(request: Request):

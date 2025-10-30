@@ -45,9 +45,9 @@ class RolePlayService(Service[RoleDTO]):
 
         roles = await self.get(RoleQueryFilter())
         for role in roles:
-            role.disabled = user_code not in enable_roles
+            role.disabled = role.code.value not in enable_roles
             for role_level in role.level:
-                role_level.disabled = user_level < role_level.step
+                role_level.disabled = role.disabled or user_level < role_level.step
 
         return roles
 
@@ -58,7 +58,7 @@ class RolePlayService(Service[RoleDTO]):
 
         user_role_code, user_role_level = get_code_level(user)
 
-        if role.code == user_role_code and level.step == user_role_level:
+        if role.code == user_role_code and level.step <= user_role_level:
             user_play_history = user.play_story or []
             user_role_play = get_story_play(role.code, level.step, data.play_code, user_play_history)
             gen_ia_service = GenIAService(user)

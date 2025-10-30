@@ -32,7 +32,7 @@ class UserService(Service[UserDTO]):
         user.created_at = datetime.now(UTC)
         return UserDTO(**await super().add(user))
 
-    async def update(self, data: UserUpdateDTO) -> bool:
+    async def user_update(self, data: UserUpdateDTO) -> bool:
         user = await self.get(UserQueryFilter(id=data.id, limit=1, offset=0))
 
         for k, v in data.model_dump(by_alias=True).items():

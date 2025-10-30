@@ -22,10 +22,6 @@ app = FastAPI(
 )
 app.add_middleware(AuthMiddleware)
 
-@app.get("/")
-async def root():
-    return {"message": "Welcome to English Pro Tech"}
-
 app.include_router(api, prefix="/api")
 
 

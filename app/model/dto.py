@@ -61,14 +61,14 @@ class RolePlayDTO(BaseModel):
     xp: int = 0
     description: Optional[str] = None
     metadata: Optional[List[dict]] = None
-    disabled: Optional[bool] = True
+    disabled: Optional[bool] = False
 
 class RoleLevelDTO(BaseModel):
     step: int = 1
     min_xp: int
     max_xp: int
     plays: Optional[List[RolePlayDTO]] = []
-    disabled: Optional[bool] = False
+    disabled: Optional[bool] = True
 
 class RoleDTO(BaseModel):
     id: PydanticObjectId = Field(default_factory=uuid.uuid4, alias="_id")

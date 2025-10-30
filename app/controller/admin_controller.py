@@ -25,7 +25,7 @@ async def add_user(request: Request, body: UserCreateDTO):
 @user_router.put("/", response_model=None)
 async def put_user(request: Request, body: UserUpdateDTO):
     service = UserService(request.app.database)
-    return await service.update(body)
+    return await service.user_update(body)
 
 @user_router.put("/change-password", response_model=None)
 async def edit_password_user(request: Request, body: ChangePasswordDTO):
