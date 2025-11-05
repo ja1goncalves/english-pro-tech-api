@@ -45,8 +45,8 @@ class GenIAService:
         Use the following additional information to make the challenge more relevant: {metadata}."""
 
         question = f"""The user replied to the practice challenge with the following answer: {answer}.
-        Please provide detailed feedback on the user's answer, highlighting strengths and areas for improvement,
-        and suggest ways to improve their technical English skills based on the answer provided.
+        Please provide a detailed feedback, as a dialog replay, on the user's answer,
+        highlighting strengths and areas for improvement, and suggest ways to improve their technical English skills based on the answer provided.
         Based on the answer, evaluate and assign an appropriate XP score between 0 and {task.xp} in the format
         'Points=20xp' at the beginning of the feedback. Like this example: 'Points=15xp. Your answer demonstrates...'."""
 
@@ -54,7 +54,7 @@ class GenIAService:
 
         regex_xp = r'Points=(\d+)xp'
         get_points = re.search(regex_xp, res)
-        xp = int(get_points.group(1)) if get_points else task.xp / 4
+        xp = int(get_points.group(1)) if get_points else task.xp / 5
 
         res = re.sub(regex_xp, "", res)
 
