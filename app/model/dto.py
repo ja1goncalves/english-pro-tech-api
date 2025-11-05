@@ -7,6 +7,7 @@ from app.model.pydantic_object_id import PydanticObjectId
 from app.model.type import UserProfile, RoleStudent, StudentLevel
 
 class ChallengeDTO(BaseModel):
+    answer: str | None = None
     question: str
     response: str
     xp: int

@@ -7,6 +7,7 @@ import uuid
 from app.model.type import UserProfile, RoleStudent, StudentLevel
 
 class Challenge(BaseModel):
+    answer: str | None = None
     question: str
     response: str
     xp: int
