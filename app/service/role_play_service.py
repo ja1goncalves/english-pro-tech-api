@@ -4,7 +4,7 @@ from app.exception.exception import RoleLevelError
 from app.model.entity import UserBase, Role
 from app.service.gen_ia_service import GenIAService
 from app.util.role_play import role_enable, get_code_level, get_story_play, is_story_play, new_story_play, play_code, \
-    is_role_play_played
+    is_role_play_played, is_role_play_done
 from pymongo.asynchronous.database import AsyncDatabase
 from app.model.dto import RoleDTO, PlayTaskDTO, RoleLevelDTO, RolePlayDTO, ChallengeDTO, UserDTO, RoleQueryFilter, \
     UserQueryFilter, RoleCreateDTO
@@ -47,9 +47,10 @@ class RolePlayService(Service[RoleDTO]):
         roles = await self.get(RoleQueryFilter())
         for role in roles:
             role.disabled = role.code.value not in enable_roles
-            for role_level in role.level:
-                role_level.disabled = role.disabled or user_level < role_level.step
-                for play in role_level.plays:
+            for level in role.level:
+                level.disabled = role.disabled or user_level < level.step
+                for play in level.plays:
+                    play.done = is_role_play_done(user_db.play_story, play)
                     play.played = is_role_play_played(user_db.play_story, play.code)
 
         return roles
