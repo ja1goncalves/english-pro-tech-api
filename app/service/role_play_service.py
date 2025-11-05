@@ -3,7 +3,8 @@ from typing import List
 from app.exception.exception import RoleLevelError
 from app.model.entity import UserBase, Role
 from app.service.gen_ia_service import GenIAService
-from app.util.role_play import role_enable, get_code_level, get_story_play, is_story_play, new_story_play, play_code
+from app.util.role_play import role_enable, get_code_level, get_story_play, is_story_play, new_story_play, play_code, \
+    is_role_play_played
 from pymongo.asynchronous.database import AsyncDatabase
 from app.model.dto import RoleDTO, PlayTaskDTO, RoleLevelDTO, RolePlayDTO, ChallengeDTO, UserDTO, RoleQueryFilter, \
     UserQueryFilter, RoleCreateDTO
@@ -39,7 +40,7 @@ class RolePlayService(Service[RoleDTO]):
             return await super().all()
 
         user_service = UserService(self.db)
-        user_db = await user_service.get(UserQueryFilter(id=str(user.id), limit=1, offset=0))
+        user_db: UserDTO = await user_service.get(UserQueryFilter(id=str(user.id), limit=1, offset=0))
         user_code, user_level = get_code_level(user_db)
         enable_roles = role_enable(user_db)
 
@@ -48,6 +49,8 @@ class RolePlayService(Service[RoleDTO]):
             role.disabled = role.code.value not in enable_roles
             for role_level in role.level:
                 role_level.disabled = role.disabled or user_level < role_level.step
+                for play in role_level.plays:
+                    play.played = is_role_play_played(user_db.play_story, play.code)
 
         return roles
 
@@ -75,27 +78,27 @@ class RolePlayService(Service[RoleDTO]):
         else:
             raise RoleLevelError("User role does not match the requested role play")
 
-    async def update_user_role_play(self, user: UserBase, role_code: RoleStudent, role_level: int, play_code: str,
+    async def update_user_role_play(self, user: UserBase, role_code: RoleStudent, role_level: int, code_play: str,
                                     play: ChallengeDTO) -> bool:
         if not user.play_story:
             user.play_story = []
-            user = new_story_play(user, role_code, role_level, play_code, play)
+            user = new_story_play(user, role_code, role_level, code_play, play)
         else:
-            for story in user.play_story:
-                if is_story_play(story, role_code, role_level, play_code):
-                    story.xp = (story.xp or 0) + play.xp
-                    if story.metadata:
-                        story.metadata.append(play.model_dump(by_alias=True))
-                    else:
-                        story.metadata = [play.model_dump(by_alias=True)]
-                    break
-                else:
-                    user = new_story_play(user, role_code, role_level, play_code, play)
+            if is_role_play_played(user.play_story, code_play):
+                for story in user.play_story:
+                    if is_story_play(story, role_code, role_level, code_play):
+                        story.xp = (story.xp or 0) + play.xp
+                        if story.metadata:
+                            story.metadata.append(play.model_dump(by_alias=True))
+                        else:
+                            story.metadata = [play.model_dump(by_alias=True)]
+                        break
+            else:
+                user = new_story_play(user, role_code, role_level, code_play, play)
 
         user.xp = (user.xp or 0) + play.xp
         old_user_level = user.level
         user.level = await self.classifier_user(user)
-        print(old_user_level, user.level)
 
         user_service = UserService(self.db)
         await user_service.update(user)
