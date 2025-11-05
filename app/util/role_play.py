@@ -21,8 +21,8 @@ def role_enable(user: UserBase | UserDTO):
     code, _ = get_code_level(user)
     return ENABLE_CODES[code] if code in ENABLE_CODES else ["JR"]
 
-def is_role_play_played(user_story: list[UserPlayStory], code: str) -> bool:
-    return code in [p.play_code for p in user_story]
+def get_story_play(user_story: list[UserPlayStory], code: str) -> UserPlayStory | None:
+    return next((s for s in user_story if s.play_code == code), None)
 
 def is_role_play_done(user_story: list[UserPlayStory], role_play: RolePlayDTO) -> bool:
     return any(story.play_code == role_play.code and story.xp >= role_play.xp for story in user_story)
@@ -30,7 +30,7 @@ def is_role_play_done(user_story: list[UserPlayStory], role_play: RolePlayDTO) -
 def is_story_play(p: UserPlayStory, role_code: RoleStudent, role_level: int, level_play: str) -> bool:
     return p.role == role_code and p.level_step == role_level and p.play_code == level_play
 
-def get_story_play(role_code: RoleStudent, role_level: int, level_play: str,
+def get_stories_play(role_code: RoleStudent, role_level: int, level_play: str,
                    user_role_play: list[UserPlayStory] = []) -> list[UserPlayStory]:
     return [p for p in user_role_play if is_story_play(p, role_code, role_level, level_play)]
 

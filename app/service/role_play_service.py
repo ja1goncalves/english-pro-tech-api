@@ -4,7 +4,7 @@ from app.exception.exception import RoleLevelError
 from app.model.entity import UserBase, Role
 from app.service.gen_ia_service import GenIAService
 from app.util.role_play import role_enable, get_code_level, get_story_play, is_story_play, new_story_play, play_code, \
-    is_role_play_played, is_role_play_done
+    get_stories_play
 from pymongo.asynchronous.database import AsyncDatabase
 from app.model.dto import RoleDTO, PlayTaskDTO, RoleLevelDTO, RolePlayDTO, ChallengeDTO, UserDTO, RoleQueryFilter, \
     UserQueryFilter, RoleCreateDTO
@@ -50,8 +50,9 @@ class RolePlayService(Service[RoleDTO]):
             for level in role.level:
                 level.disabled = role.disabled or user_level < level.step
                 for play in level.plays:
-                    play.done = is_role_play_done(user_db.play_story, play)
-                    play.played = is_role_play_played(user_db.play_story, play.code)
+                    story = get_story_play(user_db.play_story, play.code)
+                    play.played = bool(story)
+                    play.xp_done = story.xp if story else 0
 
         return roles
 
@@ -64,7 +65,7 @@ class RolePlayService(Service[RoleDTO]):
 
         if role.code == user_role_code and level.step <= user_role_level:
             user_play_history = user.play_story or []
-            user_role_play = get_story_play(role.code, level.step, data.play_code, user_play_history)
+            user_role_play = get_stories_play(role.code, level.step, data.play_code, user_play_history)
             gen_ia_service = GenIAService(user)
 
             if not user_role_play:
@@ -85,7 +86,7 @@ class RolePlayService(Service[RoleDTO]):
             user.play_story = []
             user = new_story_play(user, role_code, role_level, code_play, play)
         else:
-            if is_role_play_played(user.play_story, code_play):
+            if bool(get_story_play(user.play_story, code_play)):
                 for story in user.play_story:
                     if is_story_play(story, role_code, role_level, code_play):
                         story.xp = (story.xp or 0) + play.xp

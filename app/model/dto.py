@@ -62,7 +62,7 @@ class RolePlayDTO(BaseModel):
     description: Optional[str] = None
     metadata: Optional[List[dict]] = None
     played: Optional[bool] = False
-    done: Optional[bool] = False
+    xp_done: Optional[int] = 0
 
 class RoleLevelDTO(BaseModel):
     step: int = 1
