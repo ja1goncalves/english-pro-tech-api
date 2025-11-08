@@ -2,7 +2,7 @@ import json
 from typing import List
 from fastapi import APIRouter, Request, HTTPException, status
 
-from app.exception.exception import RoleLevelError
+from app.exception.exception import RoleLevelError, GenAIError
 from app.model.dto import RoleDTO, PlayTaskDTO, ChallengeDTO
 from app.service.role_play_service import RolePlayService
 
@@ -29,6 +29,12 @@ async def play_task(request: Request, play: PlayTaskDTO):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Decoding GEnAI response error",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+    except GenAIError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=e.__str__(),
             headers={"WWW-Authenticate": "Bearer"}
         )
     except Exception as e:

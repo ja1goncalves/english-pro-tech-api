@@ -1,6 +1,7 @@
 import re
 from typing import Tuple
 
+from app.exception.exception import GenAIError
 from app.model.entity import UserBase, Role, RoleLevel, RolePlay, UserPlayStory
 from app.util.role_play import story_play_str
 from app.model.dto import RoleDTO, RoleLevelDTO, RolePlayDTO
@@ -28,7 +29,10 @@ class GenIAService:
         technical level {step}, where {challenge} is {description} so that I can improve my skills in technical English.
         Use the following additional information to make the challenge more relevant: {metadata}"""
 
-        return 0, question, self.gen_ia.send_prompt(question)
+        try:
+            return 0, question, self.gen_ia.send_prompt(question)
+        except Exception as e:
+            raise GenAIError(e.__str__())
 
     async def answer_play(self, answer: str, story: list[UserPlayStory],
                           role: RoleDTO | Role, level: RoleLevelDTO | RoleLevel,
@@ -50,14 +54,17 @@ class GenIAService:
         Based on the answer, evaluate and assign an appropriate XP score between 0 and {task.xp} in the format
         'Points=20xp' at the beginning of the feedback. Like this example: 'Points=15xp. Your answer demonstrates...'."""
 
-        res = self.gen_ia.send_prompt(question)
+        try:
+            res = self.gen_ia.send_prompt(question)
 
-        regex_xp = r'Points=(\d+)xp'
-        get_points = re.search(regex_xp, res)
-        xp = int(get_points.group(1)) if get_points else task.xp / 5
+            regex_xp = r'Points=(\d+)xp'
+            get_points = re.search(regex_xp, res)
+            xp = int(get_points.group(1)) if get_points else task.xp / 5
 
-        res = re.sub(regex_xp, "", res)
+            res = re.sub(regex_xp, "", res)
 
-        return xp, question, res
+            return xp, question, res
+        except Exception as e:
+            raise GenAIError(e.__str__())
 
 

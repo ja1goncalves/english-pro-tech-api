@@ -17,3 +17,8 @@ class RoleLevelError(Exception):
     def __init__(self, message="Incorrect role level"):
         self.message = message
         super().__init__(message)
+
+class GenAIError(Exception):
+    def __init__(self, message="Gen AI Error"):
+        self.message = message + "\nSomething wrong with the Gen AI communication"
+        super().__init__(message)
