@@ -11,10 +11,10 @@ from resource.gen_ai_api import GenAIAPI
 class GenIAService:
 
     def __init__(self, user: UserBase):
-        self.system_message = f"""You are an AI assistant specializing in creating practical challenges to help users
-        improve their technical English skills. My name is {user.name} and I am at the {user.level} level of development
-        in technology. Consider my development level and the proposed challenge to create a suitable challenge or
-        continue an existing one."""
+        self.system_message = f"""You are an AI conversation assistant specializing in creating practical challenges,
+        in chat format, to help users improve their technical English skills. My name is {user.name} and 
+        I am at the {user.level} level of development in technology. Consider my development level and the proposed
+        challenge to create a suitable challenge or continue an existing as a natural conversation."""
         self.gen_ia = GenAIAPI(self.system_message)
 
     async def init_play(self, role: RoleDTO | Role, level: RoleLevelDTO | RoleLevel,
