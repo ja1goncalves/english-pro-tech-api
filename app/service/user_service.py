@@ -2,6 +2,8 @@ from copy import deepcopy
 from datetime import datetime, UTC
 
 from pymongo.asynchronous.database import AsyncDatabase
+
+from app.exception.exception import ConflictError
 from app.model.dto import UserDTO, UserCreateDTO, UserQueryFilter, UserUpdateDTO, ChangePasswordDTO
 from app.model.entity import UserBase
 from app.model.type import UserProfile, StudentLevel
@@ -23,6 +25,10 @@ class UserService(Service[UserDTO]):
         return [UserDTO(**role) for role in roles]
 
     async def add(self, data: UserCreateDTO) -> UserDTO:
+        user_exist = self.get(UserQueryFilter(username=data.username, limit=1, offset=0))
+        if user_exist:
+            raise ConflictError(f"The username {data.username} is already in use.")
+
         user = UserBase(**data.model_dump(by_alias=True))
         if user.profile is UserProfile.STUDENT:
             user.level = data.level if "level" in data else StudentLevel.JR1

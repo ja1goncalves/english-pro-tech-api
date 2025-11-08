@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, HTTPException, status
+
+from app.exception.exception import ConflictError
 from app.model.dto import UserDTO, UserCreateDTO, UserUpdateDTO, UserQueryFilter
 from app.model.type import UserProfile
 from app.service.user_service import UserService
@@ -8,9 +10,22 @@ router = APIRouter()
 
 @router.post("/register", response_model=UserDTO)
 async def add_user(request: Request, user: UserCreateDTO):
-    service = UserService(request.app.database)
-    user.profile = UserProfile.STUDENT
-    return await service.add(user)
+    try:
+        service = UserService(request.app.database)
+        user.profile = UserProfile.STUDENT
+        return await service.add(user)
+    except ConflictError as e:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=e.message,
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=e.__str__(),
+            headers={"WWW-Authenticate": "Bearer"}
+        )
 
 @router.put("/", response_model=None)
 async def put_user(request: Request, body: UserUpdateDTO):

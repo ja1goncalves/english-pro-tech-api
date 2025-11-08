@@ -1,6 +1,8 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Request, Query, HTTPException, status
+
+from app.exception.exception import ConflictError
 from app.model.dto import UserCreateDTO, UserDTO, UserUpdateDTO, RoleDTO, UserQueryFilter, RoleQueryFilter, \
     RoleCreateDTO, RoleUpdateDTO, ChangePasswordDTO
 from app.service.role_play_service import RolePlayService
@@ -19,8 +21,21 @@ async def get_user(request: Request, query_params: Annotated[UserQueryFilter, Qu
 
 @user_router.post("/", response_model=UserDTO)
 async def add_user(request: Request, body: UserCreateDTO):
-    service = UserService(request.app.database)
-    return await service.add(body)
+    try:
+        service = UserService(request.app.database)
+        return await service.add(body)
+    except ConflictError as e:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=e.message,
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=e.__str__(),
+            headers={"WWW-Authenticate": "Bearer"}
+        )
 
 @user_router.put("/", response_model=None)
 async def put_user(request: Request, body: UserUpdateDTO):

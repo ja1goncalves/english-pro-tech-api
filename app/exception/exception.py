@@ -8,6 +8,11 @@ class ForbiddenError(Exception):
         self.message = message
         super().__init__(message)
 
+class ConflictError(Exception):
+    def __init__(self, message="Something already exist"):
+        self.message = message
+        super().__init__(message)
+
 class UpdateError(Exception):
     def __init__(self, message="No data was updated"):
         self.message = message
