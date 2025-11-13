@@ -5,7 +5,7 @@ from app.exception.exception import GenAIError
 from app.model.entity import UserBase, Role, RoleLevel, RolePlay, UserPlayStory
 from app.util.role_play import story_play_str
 from app.model.dto import RoleDTO, RoleLevelDTO, RolePlayDTO
-from resource.gen_ai_api import GenAIAPI
+from resource.agent_ai.gen_ai_api import GenAIAPI
 
 
 class GenIAService:
@@ -47,6 +47,8 @@ class GenIAService:
         technical level {step} in the '{challenge}' challenge where {description} so that I can improve my skills
         in technical English and that I have already had the following progress history in other challenges: {story_play_str(story)}.
         Use the following additional information to make the challenge more relevant: {metadata}."""
+
+        self.gen_ia.set_message(self.system_message)
 
         question = f"""The user replied to the practice challenge with the following answer: {answer}.
         Please provide a detailed feedback, as a dialog replay, on the user's answer,

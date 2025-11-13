@@ -1,6 +1,7 @@
 import json
 
 from fastapi import FastAPI
+import asyncio
 
 from app.model.type import UserProfile
 from app.util.config import settings
@@ -35,7 +36,7 @@ class Connection:
 
         await self.populate_initial_data()
 
-    async def populate_initial_data(self):
+    async def _populate_role_plays(self):
         roles_collection = self.app.database.get_collection(Table.ROLE_PLAY)
         existing_roles = await roles_collection.count_documents({})
         with open("./database/role_play.json", "r") as f:
@@ -54,7 +55,7 @@ class Connection:
                             p["code"] = play_code(role['code'], level['step'], i)
                     await roles_collection.update_one({"code": role["code"]}, {"$set": role}, upsert=True)
 
-
+    async def _populate_users(self):
         user_collection = self.app.database.get_collection(Table.USER)
         existing_users = await user_collection.count_documents({})
         if existing_users == 0:
@@ -64,7 +65,7 @@ class Connection:
                 "password": get_password_hash(settings.ADMIN_PASSWORD),
                 "name": "Admin User",
                 "profile": UserProfile.ADMIN
-            };
+            }
             await user_collection.insert_one(admin)
         else:
             await user_collection.update_one(
@@ -77,3 +78,9 @@ class Connection:
                 },
                 upsert=True
             )
+
+    async def populate_initial_data(self):
+        await asyncio.gather(
+            self._populate_role_plays(),
+            self._populate_users()
+        )

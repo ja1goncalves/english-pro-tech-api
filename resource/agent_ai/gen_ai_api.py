@@ -10,6 +10,9 @@ class GenAIAPI:
         self.headers = {"Content-Type": "application/json"}
         self.message = message
 
+    def set_message(self, message):
+        self.message = message
+
     def send_prompt(self, question: str):
         data = {
             "model": self.model,
