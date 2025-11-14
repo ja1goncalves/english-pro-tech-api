@@ -21,7 +21,8 @@ class Settings(BaseSettings):
         "/openapi.json"
     ]
     GEN_AI_MODEL: str = os.getenv('GEN_AI_MODEL', 'llama3')
-    GEN_AI_URL: str = os.getenv('GEN_AI_URL', 'http://localhost:11434/api')
+    GEN_AI_URL: str = os.getenv('GEN_AI_URL', 'http://localhost:11434/api'),
+    GITHUB_TOKEN: str = os.getenv('GITHUB_TOKEN')
 
     class Config:
         case_sensitive = True

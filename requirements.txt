@@ -1,3 +1,4 @@
+beautifulsoup4
 scikit-learn
 chromadb
 annotated-types==0.7.0

@@ -1,5 +1,8 @@
 import os
 from pathlib import Path
+from typing import List, Dict
+
+from app.util.config import settings
 from technical_docs_fetcher import TechnicalDocsFetcher
 from github_data_fetcher import GitHubDataFetcher
 from rag_data_processor import RAGDataProcessor
@@ -7,14 +10,14 @@ from rag_vectors_store import RAGVectorStore
 from tech_english_rag_system import TechEnglishRAGSystem
 
 class DataIngestion:
-    def fetch_technical_docs(self):
+    async def fetch_technical_docs(self):
         fetcher = TechnicalDocsFetcher(delay=1.0, max_pages_per_source=20)
         # fetcher.debug_django_structure()
         print("🚀 Iniciando coleta de documentação técnica...")
-        documents = fetcher.fetch_technical_docs()
+        documents = await fetcher.fetch_technical_docs()
 
         print(f"✅ Coleta concluída! {len(documents)} documentos coletados.")
-        fetcher.save_documents(documents)
+        # fetcher.save_documents(documents)
 
         # Estatísticas
         categories = {}
@@ -27,27 +30,25 @@ class DataIngestion:
             technologies[tech] = technologies.get(tech, 0) + 1
 
         print("\n📊 Estatísticas da Coleta:")
-        print(f"📁 Categorias: {categories}")
-        print(f"🔧 Tecnologias: {technologies}")
+        print(f"📁 Categorias: {categories}", f"🔧 Tecnologias: {technologies}")
 
-    def extract_github_content(self):
-        GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
+        return documents
 
-        # 🔥 MODO AGRESSIVO para mais dados
+    async def extract_github_content(self):
         fetcher = GitHubDataFetcher(
             delay=1.0,
-            github_token=GITHUB_TOKEN,
+            github_token=settings.GITHUB_TOKEN,
             aggressive_mode=False
         )
 
         print("🚀 Iniciando coleta AGRESSIVA de dados do GitHub...")
         print("⚡ Modo: AGRESSIVO (mais dados, maior risco de rate limiting)")
 
-        documents = fetcher.fetch_all_repos_data()
+        documents = await fetcher.fetch_all_repos_data()
         print(f"\n✅ Coleta concluída! {len(documents)} documentos coletados.")
 
         if documents:
-            fetcher.save_documents(documents)
+            # fetcher.save_documents(documents)
 
             # Estatísticas detalhadas
             repos = {};
@@ -66,13 +67,14 @@ class DataIngestion:
             print(f"📄 Tipos de Arquivo: {file_types}")
             print(f"🎯 Contextos: {contexts}")
             print(f"💾 Total de documentos: {len(documents)}")
+        return documents
 
     def process_video_transcripts(self):
         # Tutorials, technical talks
         pass
 
     # Pipeline Completo
-    def run_full_rag_pipeline2(self):
+    async def run_full_rag_pipeline2(self, docs: List[Dict]):
         """
         Executa o pipeline completo de processamento RAG
         """
@@ -83,7 +85,7 @@ class DataIngestion:
 
         # 1. Processamento dos dados
         processor = RAGDataProcessor(chunk_size=800, chunk_overlap=150)
-        chunks = processor.process_all_data(tech_docs_dir, github_dir)
+        chunks = await processor.process_all_data(docs)
 
         # 2. Salva chunks processados
         processor.save_processed_chunks(chunks)
@@ -96,7 +98,7 @@ class DataIngestion:
         print("🎉 Pipeline RAG concluído!")
         return chunks
 
-    def run_full_rag_pipeline(self) -> TechEnglishRAGSystem:
+    async def run_full_rag_pipeline(self, docs: List[Dict]) -> TechEnglishRAGSystem:
         """
         Executa o pipeline completo - VERSÃO CORRIGIDA
         """
@@ -105,13 +107,13 @@ class DataIngestion:
         try:
             # 1. Processa os dados
             processor = RAGDataProcessor()
-            chunks = processor.process_all_data()
+            chunks = await processor.process_all_data(docs)
 
             # 2. Salva chunks processados
             processor.save_processed_chunks(chunks)
 
             # 3. Inicializa sistema RAG
-            rag_system = TechEnglishRAGSystem()
+            rag_system = TechEnglishRAGSystem(chunks)
 
             print("🎉 Pipeline RAG concluído com sucesso!")
             return rag_system
@@ -119,7 +121,7 @@ class DataIngestion:
         except Exception as e:
             print(f"❌ Erro no pipeline RAG: {e}")
             # Retorna sistema RAG mesmo com erro (pode ter alguns chunks)
-            return TechEnglishRAGSystem()
+            return TechEnglishRAGSystem(docs=docs)
 
     # Exemplo de uso prático
     def demonstrate_rag_usage(self):

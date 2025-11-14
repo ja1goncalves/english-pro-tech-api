@@ -79,7 +79,7 @@ class GitHubDataFetcher:
             }
         }
 
-    def fetch_all_repos_data(self) -> List[Dict]:
+    async def fetch_all_repos_data(self) -> List[Dict]:
         """
         Coleta dados de todos os repositórios com estratégia balanceada
         """
@@ -95,7 +95,7 @@ class GitHubDataFetcher:
                     print(f"   ⏳ Rate limit baixo, aguardando {wait_time}s...")
                     time.sleep(wait_time)
 
-                documents = self._fetch_repository_data(
+                documents = await self._fetch_repository_data(
                     repo_config['owner'],
                     repo_config['repo'],
                     repo_config['paths'],
@@ -132,7 +132,7 @@ class GitHubDataFetcher:
             print(f"   ⚠️ Erro ao verificar rate limit: {e}")
         return True
 
-    def _fetch_repository_data(self, owner: str, repo: str, paths: List[str], tech_category: str, repo_alias: str, max_depth: int = 1) -> List[Dict]:
+    async def _fetch_repository_data(self, owner: str, repo: str, paths: List[str], tech_category: str, repo_alias: str, max_depth: int = 1) -> List[Dict]:
         """
         Coleta dados com estratégia adaptativa baseada no modo
         """

@@ -244,11 +244,11 @@ class RAGDataProcessor:
             chunk_id=chunk_id
         )
 
-    def process_all_data(self, tech_docs_dir: str = "technical_docs", github_dir: str = "github_data") -> List[ProcessedChunk]:
+    async def process_all_data(self, documents: List[Dict]) -> List[ProcessedChunk]:
         """
         Processa todos os dados e retorna chunks prontos para o RAG
         """
-        documents = self.load_all_data(tech_docs_dir, github_dir)
+        # documents = self.load_all_data(tech_docs_dir, github_dir)
 
         all_chunks = []
 

@@ -3,27 +3,27 @@ from pathlib import Path
 from typing import List, Dict
 from rag_data_processor import RAGDataProcessor
 from resource.rag_system.data_class.processed_chunk import ProcessedChunk
-from SimpleVectorStore import SimpleVectorStore
+from simple_vector_store import SimpleVectorStore
 
 class TechEnglishRAGSystem:
-    def __init__(self, chunks_path: str = "rag_chunks/processed_chunks.jsonl"):
-        self.chunks_path = chunks_path
+    def __init__(self, chunks = [], docs = []):
+        self.chunks = chunks
         self.vector_store = SimpleVectorStore()
-        self.setup_rag_system()
+        self.setup_rag_system(docs)
 
-    def setup_rag_system(self):
+    async def setup_rag_system(self, docs: List[Dict]):
         """Configura o sistema RAG completo"""
         try:
             print("🔄 Configurando sistema RAG...")
 
             # Carrega chunks processados
-            self.chunks = self._load_processed_chunks()
+            # self.chunks = self._load_processed_chunks()
 
             if not self.chunks:
                 print("⚠️  Nenhum chunk encontrado. Processando dados...")
                 processor = RAGDataProcessor()
-                self.chunks = processor.process_all_data()
-                processor.save_processed_chunks(self.chunks)
+                self.chunks = await processor.process_all_data(docs)
+                # processor.save_processed_chunks(self.chunks)
 
             # Adiciona chunks ao vector store
             self.vector_store.add_chunks(self.chunks)
