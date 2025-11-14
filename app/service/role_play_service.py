@@ -66,7 +66,7 @@ class RolePlayService(Service[RoleDTO]):
         if role.code == user_role_code and level.step <= user_role_level:
             user_play_history = user.play_story or []
             user_role_play = get_stories_play(role.code, level.step, data.play_code, user_play_history)
-            gen_ia_service = GenIAService(user)
+            gen_ia_service = GenIAService(self.db, user)
 
             if not user_role_play:
                 xp, question, response = await gen_ia_service.init_play(role, level, play)

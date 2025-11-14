@@ -6,6 +6,18 @@ import uuid
 
 from app.model.type import UserProfile, RoleStudent, StudentLevel
 
+class ProcessedChunk(BaseModel):
+    id: ObjectId = Field(default_factory=uuid.uuid4, alias="_id")
+    content: str
+    metadata: dict
+    chunk_id: str
+    embedding: Optional[List[float]] = None
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True,
+        json_encoders={ObjectId: str}
+    )
+
 class Challenge(BaseModel):
     answer: str | None = None
     question: str

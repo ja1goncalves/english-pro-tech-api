@@ -27,3 +27,8 @@ class GenAIError(Exception):
     def __init__(self, message="Gen AI Error"):
         self.message = message + "\nSomething wrong with the Gen AI communication"
         super().__init__(message)
+
+class RAGError(Exception):
+    def __init__(self, message="RAG Error"):
+        self.message = message + "\nSomething wrong with the RAG system"
+        super().__init__(message)
