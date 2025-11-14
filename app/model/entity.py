@@ -5,6 +5,22 @@ from typing import Optional, List
 import uuid
 
 from app.model.type import UserProfile, RoleStudent, StudentLevel
+from resource.rag_system.data_class.document_metadata import DocumentMetadata
+from resource.rag_system.data_class.github_doc_metadata import GitHubDocMetadata
+
+
+class RAGDocument(BaseModel):
+    id: ObjectId = Field(default_factory=uuid.uuid4, alias="_id")
+    metadata: GitHubDocMetadata | DocumentMetadata
+    content: str
+    word_count: int
+    key_terms: List[str]
+    file_info: Optional[dict] = None
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True,
+        json_encoders={ObjectId: str}
+    )
 
 class ProcessedChunk(BaseModel):
     id: ObjectId = Field(default_factory=uuid.uuid4, alias="_id")
