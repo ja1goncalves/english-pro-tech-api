@@ -18,13 +18,7 @@ class TechnicalDocsFetcher:
         self.session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         })
-        self.technical_sources = {}
-
-        # Configuração de fontes técnicas organizadas por categoria
-        with open("./resource/technical_docs_fetcher.json", "r") as f:
-            self.technical_sources = json.load(f)
-
-        self.technical_sources2 = {
+        self.technical_sources = {
             "programming_languages": {
                 "python": {
                     "base_url": "https://docs.python.org/3/",
@@ -42,6 +36,10 @@ class TechnicalDocsFetcher:
                 }
             }
         }
+
+        # Configuração de fontes técnicas organizadas por categoria
+        with open("./resource/technical_docs_fetcher.json", "r") as f:
+            self.technical_sources = json.load(f)
 
     async def fetch_technical_docs(self) -> List[Dict]:
         """

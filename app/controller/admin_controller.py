@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, Request, Query, HTTPException, status
 from app.exception.exception import ConflictError
 from app.model.dto import UserCreateDTO, UserDTO, UserUpdateDTO, RoleDTO, UserQueryFilter, RoleQueryFilter, \
     RoleCreateDTO, RoleUpdateDTO, ChangePasswordDTO
+from app.service.rag_doc_service import RagDocService
 from app.service.role_play_service import RolePlayService
 from app.service.user_service import UserService
 from app.util.security import is_admin
@@ -80,6 +81,14 @@ async def del_role_play(request: Request, key: str):
     service = RolePlayService(request.app.database)
     return await service.remove(key)
 
+rag_router = APIRouter()
+
+@rag_router.put("/refresh", response_model=None)
+async def refresh_rag(request: Request):
+    service = RagDocService(request.app.database)
+    return await service.refresh_rag()
+
 router.include_router(user_router, prefix="/user", tags=["User Management"])
+router.include_router(rag_router, prefix="/rag", tags=["RAG Management"])
 router.include_router(role_play_router, prefix="/role-play", tags=["Role Play Management"])
 

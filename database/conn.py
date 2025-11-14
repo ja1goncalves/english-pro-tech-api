@@ -4,13 +4,13 @@ from fastapi import FastAPI
 import asyncio
 
 from app.model.type import UserProfile
+from app.service.rag_doc_service import RagDocService
 from app.util.config import settings
 from pymongo import AsyncMongoClient
-from resource.rag_system.data_ingestion import DataIngestion
+
 from app.util.role_play import play_code
 from app.util.security import get_password_hash
 from database.collections import Table
-from resource.rag_system.rag_data_processor import RAGDataProcessor
 
 
 class Connection:
@@ -86,65 +86,17 @@ class Connection:
                 upsert=True
             )
 
-    async def _save_rag_docs(self, docs):
-        doc_fail_count = 0
-        try:
-            for doc in docs:
-                rag_docs_collection = self.app.database.get_collection(Table.RAG_DOC)
-                query_filter = {"metadata.url": doc["metadata"].url}
-                update_operation = {
-                    "$set": {
-                        "metadata": doc.get("metadata").dict(),
-                        "content": doc.get("content"),
-                        "word_count": doc.get("word_count"),
-                        "key_terms": doc.get("key_terms"),
-                        "file_info": doc.get("file_info", {})
-                    }
-                }
-                await rag_docs_collection.update_one(query_filter, update_operation, upsert=True)
-        except Exception as e:
-            print(f"❌ Erro ao salvar documentos RAG: {e}")
-            doc_fail_count += 1
-
-        return doc_fail_count
-
-    async def _save_rag_chucks(self, chucks):
-        chucks_fail_count = 0
-        try:
-            for chunk in chucks:
-                rag_chuck_collection = self.app.database.get_collection(Table.RAG_CHUNK)
-                query_filter = {"chunk_id": chunk.chunk_id}
-                update_operation = {
-                    "$set": {
-                        'chunk_id': chunk.chunk_id,
-                        'content': chunk.content,
-                        'metadata': chunk.metadata,
-                        'embedding': chunk.embedding
-                    }
-                }
-                await rag_chuck_collection.update_one(query_filter, update_operation, upsert=True)
-        except Exception as e:
-            print(f"❌ Erro ao salvar documentos RAG: {e}")
-            chucks_fail_count += 1
-
-        return chucks_fail_count
-
     async def _populate_rag(self):
-        data_ingestion = DataIngestion()
-        rag_processor = RAGDataProcessor()
+        rag_docs_collection = self.app.database.get_collection(Table.RAG_DOC)
+        rag_chunk_collection = self.app.database.get_collection(Table.RAG_CHUNK)
 
-        tech_docs, git_docs = await asyncio.gather(
-            data_ingestion.fetch_technical_docs(),
-            data_ingestion.extract_github_content()
-        )
-        all_docs = tech_docs + git_docs
+        existing_docs = await rag_docs_collection.count_documents({})
+        existing_chunk = await rag_chunk_collection.count_documents({})
 
-        chunks, _ =await asyncio.gather(
-            rag_processor.process_all_data(all_docs),
-            self._save_rag_docs(all_docs),
-        )
-
-        await self._save_rag_chucks(chunks)
+        if existing_docs == 0 or existing_chunk == 0:
+            service = RagDocService(self.app.database)
+            result = await service.refresh_rag()
+            print(f"RAG initial population build with {'errors' if result else 'success'}.")
 
     async def populate_initial_data(self):
         await asyncio.gather(
