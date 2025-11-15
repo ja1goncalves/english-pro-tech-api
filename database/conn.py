@@ -44,8 +44,10 @@ class Connection:
         await self.populate_initial_data()
 
     async def _populate_role_plays(self):
+        print("Populating role plays...")
         roles_collection = self.app.database.get_collection(Table.ROLE_PLAY)
         existing_roles = await roles_collection.count_documents({})
+        print(f"{existing_roles} role plays found in the database.")
         with open("./database/role_play.json", "r") as f:
             initial_roles = json.load(f)
             if existing_roles == 0:
@@ -54,17 +56,21 @@ class Connection:
                         for i, p in enumerate(level["plays"]):
                             p["code"] = play_code(role['code'], level['step'], i)
 
+                print(f"Adding {len(initial_roles['role'])} initial role plays to the database.")
                 await roles_collection.insert_many(initial_roles["role"])
             else:
                 for role in initial_roles["role"]:
                     for level in role["level"]:
                         for i, p in enumerate(level["plays"]):
                             p["code"] = play_code(role['code'], level['step'], i)
+                    print(f"Updating {role["code"]} role plays to the database.")
                     await roles_collection.update_one({"code": role["code"]}, {"$set": role}, upsert=True)
 
     async def _populate_users(self):
+        print("Populating users...")
         user_collection = self.app.database.get_collection(Table.USER)
         existing_users = await user_collection.count_documents({})
+        print(f"{existing_users} role plays found in the database.")
         if existing_users == 0:
             admin = {
                 "username": "admin",
@@ -73,8 +79,10 @@ class Connection:
                 "name": "Admin User",
                 "profile": UserProfile.ADMIN
             }
+            print(f"Adding admin user to the database.")
             await user_collection.insert_one(admin)
         else:
+            print(f"Updating admin user to the database.")
             await user_collection.update_one(
                 {"username": "admin"},
                 {
@@ -92,6 +100,7 @@ class Connection:
 
         existing_docs = await rag_docs_collection.count_documents({})
         existing_chunk = await rag_chunk_collection.count_documents({})
+        print(f"{existing_docs} docs and {existing_chunk} chunks found in the database.")
 
         if existing_docs == 0 or existing_chunk == 0:
             service = RagDocService(self.app.database)
