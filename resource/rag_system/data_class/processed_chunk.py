@@ -7,3 +7,4 @@ class ProcessedChunk:
     metadata: Dict[str, Any]
     chunk_id: str
     embedding: List[float] = None
+    _id: str | None = None

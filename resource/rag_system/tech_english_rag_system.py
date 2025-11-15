@@ -6,12 +6,19 @@ from resource.rag_system.data_class.processed_chunk import ProcessedChunk
 from resource.rag_system.simple_vector_store import SimpleVectorStore
 
 class TechEnglishRAGSystem:
-    def __init__(self, chunks = [], docs = []):
+    def __init__(self, chunks:List[ProcessedChunk]=[], docs:List[Dict]=[]):
         self.chunks = chunks
+        self.docs_to_process = docs
         self.vector_store = SimpleVectorStore()
-        self.setup_rag_system(docs)
+        # self.setup_rag_system(docs)
 
-    async def setup_rag_system(self, docs: List[Dict]):
+    @classmethod
+    async def create_and_setup(cls, chunks:List[ProcessedChunk]=[], docs:List[Dict]=[]):
+        instance = cls(chunks, docs)
+        await instance.setup_rag_system()
+        return instance
+
+    async def setup_rag_system(self):
         """Configura o sistema RAG completo"""
         try:
             print("🔄 Configurando sistema RAG...")
@@ -22,10 +29,9 @@ class TechEnglishRAGSystem:
             if not self.chunks:
                 print("⚠️  Nenhum chunk encontrado. Processando dados...")
                 processor = RAGDataProcessor()
-                self.chunks = await processor.process_all_data(docs)
+                self.chunks = await processor.process_all_data(self.docs_to_process)
                 # processor.save_processed_chunks(self.chunks)
 
-            # Adiciona chunks ao vector store
             self.vector_store.add_chunks(self.chunks)
 
             print(f"✅ Sistema RAG configurado com {len(self.chunks)} chunks")
