@@ -35,10 +35,10 @@ class Connection:
         if Table.USER not in collections:
             await self.app.database.create_collection(Table.USER)
 
-        if Table.RAG_DOCS not in collections:
+        if Table.RAG_DOC not in collections:
             await self.app.database.create_collection(Table.RAG_DOC)
 
-        if Table.RAG_CHUNKS not in collections:
+        if Table.RAG_CHUNK not in collections:
             await self.app.database.create_collection(Table.RAG_CHUNK)
 
         await self.populate_initial_data()
