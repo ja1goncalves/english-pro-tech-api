@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta, UTC
 from typing import Optional
+
+import bcrypt
 import jwt
 from fastapi import HTTPException, status
 from pymongo.asynchronous.database import AsyncDatabase
@@ -8,9 +10,18 @@ from app.exception.exception import ForbiddenError
 from app.model.entity import UserBase
 from app.model.type import UserProfile
 from app.util.config import settings
-from passlib.context import CryptContext
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+def verify_password(plain_password, hashed_password):
+    return bcrypt.checkpw(
+        bytes(plain_password, encoding="utf-8"),
+        bytes(hashed_password, encoding="utf-8"),
+    )
+
+def get_password_hash(password):
+    return bcrypt.hashpw(
+        bytes(password, encoding="utf-8"),
+        bcrypt.gensalt(),
+    ).decode("utf-8")
 
 def is_admin(request: Request):
     if request.state.user.profile is not UserProfile.ADMIN:
@@ -19,12 +30,6 @@ def is_admin(request: Request):
             detail="Administrative privileges required",
             headers={"WWW-Authenticate": "Bearer"}
         )
-
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
-
-def get_password_hash(password):
-    return pwd_context.hash(password)
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()

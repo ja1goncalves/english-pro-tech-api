@@ -1,5 +1,6 @@
 annotated-types==0.7.0
 anyio==4.11.0
+bcrypt==5.0.0
 certifi==2025.10.5
 charset-normalizer==3.4.4
 click==8.3.0
@@ -8,7 +9,6 @@ email-validator==2.3.0
 fastapi==0.119.1
 h11==0.16.0
 idna==3.11
-passlib==1.7.4
 pydantic==2.12.3
 pydantic-extra-types==2.10.6
 pydantic-settings==2.11.0
