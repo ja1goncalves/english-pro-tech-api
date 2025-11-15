@@ -25,7 +25,7 @@ class UserService(Service[UserDTO]):
         return [UserDTO(**role) for role in roles]
 
     async def add(self, data: UserCreateDTO) -> UserDTO:
-        user_exist = self.get(UserQueryFilter(username=data.username, limit=1, offset=0))
+        user_exist = await self.get(UserQueryFilter(username=data.username, limit=1, offset=0))
         if user_exist:
             raise ConflictError(f"The username {data.username} is already in use.")
 
