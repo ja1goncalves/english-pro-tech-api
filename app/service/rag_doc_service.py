@@ -1,4 +1,5 @@
 import asyncio
+from dataclasses import asdict
 
 from pymongo.asynchronous.database import AsyncDatabase
 from app.model.entity import RAGDocument
@@ -18,15 +19,15 @@ class RagDocService(Service[RAGDocument]):
         data_ingestion = DataIngestion()
         rag_processor = RAGDataProcessor()
 
-        docs = await asyncio.gather(
+        tech_docs, git_docs = await asyncio.gather(
             data_ingestion.fetch_technical_docs(),
             data_ingestion.extract_github_content()
         )
-        tech_docs, git_docs = docs
+        docs = tech_docs + git_docs
 
-        chunks, docs_failed = await asyncio.gather(
-            rag_processor.process_all_data(tech_docs + git_docs),
-            self._save_rag_docs(tech_docs + git_docs),
+        docs_failed, chunks = await asyncio.gather(
+            self._save_rag_docs(docs),
+            rag_processor.process_all_data(docs),
         )
 
         chunks_failed = await self._save_rag_chucks(chunks)
@@ -35,8 +36,8 @@ class RagDocService(Service[RAGDocument]):
 
     async def _save_rag_chucks(self, chucks):
         chucks_fail_count = 0
-        try:
-            for chunk in chucks:
+        for chunk in chucks:
+            try:
                 rag_chunk_collection = self.db.get_collection(Table.RAG_CHUNK)
                 query_filter = {"chunk_id": chunk.chunk_id}
                 update_operation = {
@@ -48,22 +49,23 @@ class RagDocService(Service[RAGDocument]):
                     }
                 }
                 await rag_chunk_collection.update_one(query_filter, update_operation, upsert=True)
-        except Exception as e:
-            print(f"❌ Erro ao salvar documentos RAG: {e}")
-            chucks_fail_count += 1
+            except Exception as e:
+                print(f"❌ Erro ao salvar Chunk RAG: {e}")
+                chucks_fail_count += 1
+                continue
 
         return chucks_fail_count
 
 
     async def _save_rag_docs(self, docs):
         doc_fail_count = 0
-        try:
-            for doc in docs:
+        for doc in docs:
+            try:
                 rag_docs_collection = self.db.get_collection(Table.RAG_DOC)
                 query_filter = {"metadata.url": doc["metadata"].url}
                 update_operation = {
                     "$set": {
-                        "metadata": doc.get("metadata").dict(),
+                        "metadata": asdict(doc.get("metadata")),
                         "content": doc.get("content"),
                         "word_count": doc.get("word_count"),
                         "key_terms": doc.get("key_terms"),
@@ -71,8 +73,9 @@ class RagDocService(Service[RAGDocument]):
                     }
                 }
                 await rag_docs_collection.update_one(query_filter, update_operation, upsert=True)
-        except Exception as e:
-            print(f"❌ Erro ao salvar documentos RAG: {e}")
-            doc_fail_count += 1
+            except Exception as e:
+                print(f"❌ Erro ao salvar documentos RAG: {e}")
+                doc_fail_count += 1
+                continue
 
         return doc_fail_count

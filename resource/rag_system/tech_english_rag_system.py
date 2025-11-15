@@ -1,9 +1,9 @@
 import json
 from pathlib import Path
 from typing import List, Dict
-from rag_data_processor import RAGDataProcessor
+from resource.rag_system.rag_data_processor import RAGDataProcessor
 from resource.rag_system.data_class.processed_chunk import ProcessedChunk
-from simple_vector_store import SimpleVectorStore
+from resource.rag_system.simple_vector_store import SimpleVectorStore
 
 class TechEnglishRAGSystem:
     def __init__(self, chunks = [], docs = []):

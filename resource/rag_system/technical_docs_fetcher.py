@@ -8,7 +8,7 @@ from urllib.parse import urljoin, urlparse
 import os
 from pathlib import Path
 from typing import List, Dict, Optional
-from data_class.document_metadata import DocumentMetadata
+from resource.rag_system.data_class.document_metadata import DocumentMetadata
 
 class TechnicalDocsFetcher:
     def __init__(self, delay: float = 1.0, max_pages_per_source: int = 50):
@@ -38,7 +38,7 @@ class TechnicalDocsFetcher:
         }
 
         # Configuração de fontes técnicas organizadas por categoria
-        with open("./resource/technical_docs_fetcher.json", "r") as f:
+        with open("./resource/rag_system/technical_sources.json", "r") as f:
             self.technical_sources = json.load(f)
 
     async def fetch_technical_docs(self) -> List[Dict]:

@@ -70,7 +70,7 @@ class Connection:
         print("Populating users...")
         user_collection = self.app.database.get_collection(Table.USER)
         existing_users = await user_collection.count_documents({})
-        print(f"{existing_users} role plays found in the database.")
+        print(f"{existing_users} users found in the database.")
         if existing_users == 0:
             admin = {
                 "username": "admin",

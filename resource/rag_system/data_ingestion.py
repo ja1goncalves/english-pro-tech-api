@@ -3,11 +3,11 @@ from pathlib import Path
 from typing import List, Dict
 
 from app.util.config import settings
-from technical_docs_fetcher import TechnicalDocsFetcher
-from github_data_fetcher import GitHubDataFetcher
-from rag_data_processor import RAGDataProcessor
-from rag_vectors_store import RAGVectorStore
-from tech_english_rag_system import TechEnglishRAGSystem
+from resource.rag_system.technical_docs_fetcher import TechnicalDocsFetcher
+from resource.rag_system.github_data_fetcher import GitHubDataFetcher
+from resource.rag_system.rag_data_processor import RAGDataProcessor
+from resource.rag_system.rag_vectors_store import RAGVectorStore
+from resource.rag_system.tech_english_rag_system import TechEnglishRAGSystem
 
 class DataIngestion:
     async def fetch_technical_docs(self):

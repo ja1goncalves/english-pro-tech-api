@@ -2,9 +2,10 @@ import json
 import os
 import re
 import hashlib
+from dataclasses import asdict
 from pathlib import Path
 from typing import List, Dict, Any
-from data_class.processed_chunk import ProcessedChunk
+from resource.rag_system.data_class.processed_chunk import ProcessedChunk
 
 class RAGDataProcessor:
     def __init__(self, chunk_size: int = 1000, chunk_overlap: int = 200):
@@ -255,17 +256,12 @@ class RAGDataProcessor:
         for doc in documents:
             try:
                 content = doc.get('content', '')
-                metadata = doc.get('metadata', {})
-                source_type = doc.get('source_type', 'unknown')
-
-                # Adiciona source_type aos metadados
-                metadata['source_type'] = source_type
+                metadata = asdict(doc['metadata']) if 'metadata' in doc else {}
 
                 chunks = self.intelligent_chunking(content, metadata)
                 all_chunks.extend(chunks)
 
                 print(f"✅ Processado: {metadata.get('title', 'Unknown')} -> {len(chunks)} chunks")
-
             except Exception as e:
                 print(f"❌ Erro ao processar documento: {e}")
                 continue
